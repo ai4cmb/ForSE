@@ -40,8 +40,6 @@ class DCGAN:
         self.img_size = img_size
         self.channels = 1
         self.kernel_size = 5
-        #self.discriminator_path = discriminator_path
-        #self.generator_path = generator_path
         self.output_directory = output_directory
 
     def build_generator(self):
@@ -49,25 +47,20 @@ class DCGAN:
         model = Sequential()
         model.add(Conv2D(64, kernel_size=self.kernel_size, padding="same")) # 64x64x64
         model.add(LeakyReLU(alpha=0.2))
-        #model.add(Dropout(0.25))
         model.add(BatchNormalization(momentum=0.5))
         model.add(Conv2D(128, kernel_size=self.kernel_size, padding="same", strides=2)) #32x32x128
         model.add(LeakyReLU(alpha=0.2))
-        #model.add(Dropout(0.25))
         model.add(BatchNormalization(momentum=0.5))
         model.add(Conv2D(256, kernel_size=self.kernel_size, padding="same", strides=2)) #16x16x256
         model.add(LeakyReLU(alpha=0.2))
-        #model.add(Dropout(0.25))
         model.add(BatchNormalization(momentum=0.5))
         model.add(UpSampling2D())  #32x32x128
         model.add(Conv2D(128, kernel_size=self.kernel_size, padding="same"))
         model.add(LeakyReLU(alpha=0.2))
-        #model.add(Dropout(0.25))
         model.add(BatchNormalization(momentum=0.5))
         model.add(UpSampling2D())  #64x64x64
         model.add(Conv2D(64, kernel_size=self.kernel_size, padding="same"))
         model.add(LeakyReLU(alpha=0.2))
-        #model.add(Dropout(0.25))
         model.add(BatchNormalization(momentum=0.5))
         model.add(Conv2D(self.channels, kernel_size=self.kernel_size, padding="same"))
         model.add(Activation("tanh"))
@@ -98,12 +91,6 @@ class DCGAN:
     def build_gan(self):
         img_shape = (self.img_size[0], self.img_size[1], self.channels)
         optimizer = Adam(0.0002, 0.5)
-
-        #if os.path.exists(self.discriminator_path) and os.path.exists(self.generator_path):
-        #    self.discriminator = load_model(self.discriminator_path)
-        #    self.generator = load_model(self.generator_path)
-        #    print("Loaded models...")
-        #else:
         self.discriminator = self.build_discriminator()
         self.discriminator.compile(loss='binary_crossentropy',
                                        optimizer=optimizer,
@@ -117,46 +104,21 @@ class DCGAN:
         self.combined = Model(z, valid)
         self.combined.compile(loss='binary_crossentropy', optimizer=optimizer)
 
-    def load_training_set(self, patch_path):
-        Y,X = np.load(patch_path+'training_set_1000patches_10x10def_T_hr_1deg_lr_5deg_Npix64_set2.npy')
+    def load_training_set(self, patches_file):
+        Y,X = np.load(patches_file)
         Y = Y-X
-        #Y = np.log10(np.transpose(Y[:1000]))
-        #X = np.log10(np.transpose(X[:1000]))
         Y = np.transpose(Y[:1000])
         X = np.transpose(X[:1000])
         for i in range(Y.shape[-1]):
             Y[:,:,i] = 2*(Y[:,:,i]-Y[:,:,i].min())/(Y[:,:,i].max()-Y[:,:,i].min())-1
             X[:,:,i] = 2*(X[:,:,i]-X[:,:,i].min())/(X[:,:,i].max()-X[:,:,i].min())-1
-            #Y[:,:,i] = 2*(Y[:,:,i]-Y[:,:,:].min())/(Y[:,:,:].max()-Y[:,:,:].min())-1
-            #X[:,:,i] = 2*(X[:,:,i]-Y[:,:,:].min())/(Y[:,:,:].max()-Y[:,:,:].min())-1
-        x_train, x_test = split_train_sets(X)
-        y_train, y_test = split_train_sets(Y)
-        return x_train, x_test, y_train, y_test
-    
-    def load_training_set_zoomed(self, patch_path):
-        Ys, Xs = np.load(patch_path+'training_set_1000patches_10x10def_T_hr_1deg_lr_5deg_Npix64_set2.npy')
-        Yl, Xl = np.load(patch_path+'training_set_1000patches_10x10def_T_hr_1deg_lr_5deg_Npix320_set2.npy')
-        Xl_zoom = np.zeros((25*len(Yl), 64, 64))
-        for i in range(40):
-            Xl_zoom[i*25:(i+1)*25] = divide_image(Yl[i])
-        X, Y = Xl_zoom, Ys-Xs
-        #Y = np.log10(np.transpose(Y[:1000]))
-        #X = np.log10(np.transpose(X[:1000]))
-        Y = np.transpose(Y[:1000])
-        X = np.transpose(X[:1000])
-        for i in range(Y.shape[-1]):
-            Y[:,:,i] = 2*(Y[:,:,i]-Y[:,:,i].min())/(Y[:,:,i].max()-Y[:,:,i].min())-1
-            X[:,:,i] = 2*(X[:,:,i]-X[:,:,i].min())/(X[:,:,i].max()-X[:,:,i].min())-1
-            #Y[:,:,i] = Y[:,:,i]/np.std(Xs[i])
-            #X[:,:,i] = X[:,:,i]/np.std(X[:,:,i])
         x_train, x_test = split_train_sets(X)
         y_train, y_test = split_train_sets(Y)
         return x_train, x_test, y_train, y_test
 
-    def train(self, epochs, batch_size=32, save_interval=100, patch_path='/global/homes/k/krach/scratch/NNforFG/training_set/'):
+    def train(self, epochs, patches_file, batch_size=32, save_interval=100):
         self.build_gan()
         X_train, X_test, Y_train, Y_test = self.load_training_set(patch_path)
-        #X_train, X_test, Y_train, Y_test = self.load_training_set_zoomed(patch_path)
         print("Training Data Shape: ", X_train.shape)
         half_batch = batch_size // 2
         accs = []
@@ -191,10 +153,3 @@ class DCGAN:
         self.discriminator.save(save_path + '/discrim_'+str(epoch)+'.h5')
         self.generator.save(save_path + '/generat_'+str(epoch)+'.h5')
         np.save(save_path + '/acc_dreal_dfake_'+str(epoch)+'.npy', accs_to_save)
-
-
-
-if __name__ == '__main__':
-
-    dcgan = DCGAN(output_directory='./tests/', img_size=(64, 64))
-    dcgan.train(epochs=500000, batch_size=32, save_interval=5000)
