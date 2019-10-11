@@ -71,15 +71,14 @@ class DCGAN:
     def build_discriminator(self):
         img_shape = (self.img_size[0], self.img_size[1], self.channels)
         model = Sequential()
-        model.add(Conv2D(64, kernel_size=self.kernel_size, strides=1, input_shape=img_shape, padding="same"))  # 192x256 -> 96x128
+        model.add(Conv2D(64, kernel_size=self.kernel_size, strides=1, input_shape=img_shape, padding="same"))
         model.add(LeakyReLU(alpha=0.2))
         model.add(Dropout(0.25))
         model.add(BatchNormalization(momentum=0.5))
-        model.add(Conv2D(128, kernel_size=self.kernel_size, strides=2, padding="same"))  # 48x64 -> 24x32
-        model.add(LeakyReLU(alpha=0.2))
+        model.add(Conv2D(128, kernel_size=self.kernel_size, strides=2, padding="same"))
         model.add(Dropout(0.25))
         model.add(BatchNormalization(momentum=0.5))
-        model.add(Conv2D(256, kernel_size=self.kernel_size, strides=2, padding="same"))  # 24x32 -> 12x16
+        model.add(Conv2D(256, kernel_size=self.kernel_size, strides=2, padding="same"))
         model.add(LeakyReLU(alpha=0.2))
         model.add(Dropout(0.25))
         model.add(Flatten())

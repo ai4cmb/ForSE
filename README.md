@@ -1,2 +1,2 @@
 # ForSE
-ForSE: Foreground Scale Extractor
+ForSE: Foreground Scale Extension
