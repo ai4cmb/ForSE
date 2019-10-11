@@ -1,3 +1,4 @@
+from forse.mmmtools import *
 from keras.models import Sequential, Model, load_model
 from keras.layers import UpSampling2D, Conv2D, Activation, BatchNormalization
 from keras.layers import Reshape, Dense, Input
@@ -5,35 +6,6 @@ from keras.layers import LeakyReLU, Dropout, Flatten, ZeroPadding2D
 from keras.optimizers import Adam
 import numpy as np
 import os
-
-def split_train_sets(xraw):
-    nstamps = xraw.shape[-1]
-    npix = xraw.shape[0]
-    nchans = 1
-    ntrains = int(nstamps *  4./5.)
-    ntests = int(nstamps * 1./5.)
-    train = xraw[:,:,:ntrains].T.reshape(ntrains,npix,npix, 1)
-    test = xraw[:,:,-ntests:].T.reshape(ntests,npix,npix,  1)
-    return train, test
-
-def divide_image(image):
-    test_set_zoom = np.zeros((25, 64, 64))
-    ind = 0
-    for xax in range(5):
-        for yax in range(5):
-            test_set_zoom[ind, :, :] = image[64*xax:64*(xax+1), 64*yax:64*(yax+1)]
-            ind = ind+1
-    return test_set_zoom
-
-def unify_image(images):
-    one_big = np.zeros((320, 320))
-    ind = 0
-    for xax in range(5):
-        for yax in range(5):
-            one_big[64*xax:64*(xax+1), 64*yax:64*(yax+1)] = images[ind, :, :, 0]
-            ind = ind+1
-    return one_big
-
 
 class DCGAN:
     def __init__(self, output_directory, img_size):
@@ -106,13 +78,13 @@ class DCGAN:
     def load_training_set(self, patches_file):
         Y,X = np.load(patches_file)
         Y = Y-X
-        Y = np.transpose(Y[:1000])
-        X = np.transpose(X[:1000])
+        Y = np.transpose(Y[:len(Y)])
+        X = np.transpose(X[:len(X)])
         for i in range(Y.shape[-1]):
             Y[:,:,i] = 2*(Y[:,:,i]-Y[:,:,i].min())/(Y[:,:,i].max()-Y[:,:,i].min())-1
             X[:,:,i] = 2*(X[:,:,i]-X[:,:,i].min())/(X[:,:,i].max()-X[:,:,i].min())-1
-        x_train, x_test = split_train_sets(X)
-        y_train, y_test = split_train_sets(Y)
+        x_train, x_test = split_training_set(X)
+        y_train, y_test = split_training_set(Y)
         return x_train, x_test, y_train, y_test
 
     def train(self, epochs, patches_file, batch_size=32, save_interval=100):
