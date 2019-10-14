@@ -106,7 +106,7 @@ class DCGAN:
             # Train the discriminator (real classified as ones and generated as zeros)
             target_real = np.ones((half_batch, 1))
             target_fake = np.zeros((half_batch, 1))
-            swap = numpy.random.randint(0, 100)
+            swap = np.random.randint(0, 100)
             if swap < half_batch:
                 target_real[swap] = 0
                 target_fake[swap] = 1
