@@ -1,5 +1,66 @@
 import numpy as np
 
+def h2f(hmap,target_header,coord_in='G'):
+    #project healpix -> flatsky
+    pr,footprint = reproject.reproject_from_healpix(
+    (hmap, coord_in), target_header, shape_out=(500,500),
+    order='nearest-neighbor', nested=False)
+    return pr
+
+def f2h(flat,target_header,nside,coord_in='G'):
+    #project flatsky->healpix
+    pr,footprint = reproject.reproject_to_healpix(
+    (flat, target_header),coord_system_out='G', nside=nside ,
+    order='nearest-neighbor', nested=False)
+    return pr
+
+def set_header(ra,dec, size_patch , Npix=128):
+    hdr = fits.Header()
+    hdr.set('SIMPLE' , 'T')
+    hdr.set('BITPIX' , -32)
+    hdr.set('NAXIS'  ,  2)
+    hdr.set('NAXIS1' ,  Npix)
+    hdr.set('NAXIS2' ,  Npix )
+    hdr.set('CRVAL1' ,  ra)
+    hdr.set('CRVAL2' ,  dec)
+    hdr.set('CRPIX1' ,  Npix/2. +.5)
+    hdr.set('CRPIX2' ,  Npix/2. +.5 )
+    hdr.set('CD1_1'  , size_patch )
+    hdr.set('CD2_2'  , -size_patch )
+    hdr.set('CD2_1'  ,  0.0000000)
+    hdr.set('CD1_2'  , -0.0000000)
+    hdr.set('CTYPE1'  , 'RA---ZEA')
+    hdr.set('CTYPE2'  , 'DEC--ZEA')
+    hdr.set('CUNIT1'  , 'deg')
+    hdr.set('CUNIT2'  , 'deg')
+    hdr.set('COORDSYS','icrs')
+    return hdr
+
+def make_train_set(Ntrain, m_hres, m_lres, Npix, patch_dim, seed=None):
+    high_res_patches = []
+    low_res_patches = []
+    reso_amin = patch_dim*60./Npix
+    sizepatch = reso_amin/60.
+    if seed:
+        np.random.seed(seed)
+    for N in range(Ntrain):
+        lat = np.random.uniform(-90,90)
+        lon = np.random.uniform(0,360)
+        header = set_header(lon, lat, sizepatch, Npix)
+        if len(m_hres)>3: 
+            high_res_patches.append(h2f(m_hres, header))
+            low_res_patches.append(h2f(m_lres, header))
+        else:
+            high_res_patch_TQU = np.zeros((len(m_hres), Npix, Npix))
+            low_res_patch_TQU = np.zeros((len(m_lres), Npix, Npix))
+            for i in range(len(m_hres)):
+                high_res_patch_TQU[i] = h2f(m_hres[i], header)
+                low_res_patch_TQU[i] = h2f(m_lres[i], header)
+            high_res_patches.append(high_res_patch_TQU)
+            low_res_patches.append(low_res_patch_TQU)         
+    patches = np.array([high_res_patches, low_res_patches])
+    return patches 
+
 def split_training_set(xraw):
     nstamps = xraw.shape[-1]
     npix = xraw.shape[0]
