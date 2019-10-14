@@ -104,14 +104,14 @@ class DCGAN:
             idx = np.random.randint(0, X_train.shape[0], half_batch)
             gen_imgs = self.generator.predict(X_train[idx])
             # Train the discriminator (real classified as ones and generated as zeros)
-            target_real = np.ones((half_batch, 1)
-            target_fake = np.zeros((half_batch, 1)
+            target_real = np.ones((half_batch, 1))
+            target_fake = np.zeros((half_batch, 1))
             swap = numpy.random.randint(0, 100)
             if swap < half_batch:
                 target_real[swap] = 0
                 target_fake[swap] = 1
             d_loss_real = self.discriminator.train_on_batch(imgs, target_real)
-            d_loss_fake = self.discriminator.train_on_batch(gen_imgs, target_fake))
+            d_loss_fake = self.discriminator.train_on_batch(gen_imgs, target_fake)
             d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
             acc = [d_loss_real[1], d_loss_fake[1]]
             accs.append(acc)
