@@ -1,4 +1,8 @@
 import numpy as np
+import healpy as hp
+import reproject
+from astropy.wcs import WCS
+import astropy.io.fits as fits
 
 def h2f(hmap,target_header,coord_in='G'):
     #project healpix -> flatsky
