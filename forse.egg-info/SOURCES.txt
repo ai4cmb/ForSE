@@ -1,0 +1,11 @@
+README.md
+setup.py
+forse/__init__.py
+forse/mmmtools.py
+forse.egg-info/PKG-INFO
+forse.egg-info/SOURCES.txt
+forse.egg-info/dependency_links.txt
+forse.egg-info/not-zip-safe
+forse.egg-info/top_level.txt
+forse/networks/__init__.py
+forse/networks/dcgan.py
