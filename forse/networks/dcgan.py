@@ -89,7 +89,7 @@ class DCGAN:
 
     def train(self, epochs, patches_file, batch_size=32, save_interval=100):
         self.build_gan()
-        X_train, X_test, Y_train, Y_test = self.load_training_set(patch_path)
+        X_train, X_test, Y_train, Y_test = self.load_training_set(patches_file)
         print("Training Data Shape: ", X_train.shape)
         half_batch = batch_size // 2
         accs = []
