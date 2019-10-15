@@ -34,3 +34,4 @@ MANIFEST
 
 # test
 ./forse/notebooks/temp
+./forse/notebooks/.ipynb_checkpoints
