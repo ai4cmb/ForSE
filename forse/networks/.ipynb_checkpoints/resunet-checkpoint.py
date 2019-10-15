@@ -179,6 +179,7 @@ class ResUNet:
         scores = self.model.evaluate(x_train, y_train, verbose=self.verbose)
         if self.verbose : print( f"{self.model.metrics_names[1]} :  {scores[1]*100}" )
         save_path = self.model_directory + "/models"
+        print (training.history.keys()  )
         if not os.path.exists(save_path):
             os.makedirs(save_path)
         for key in training.history.keys() :
