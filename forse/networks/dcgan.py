@@ -1,4 +1,3 @@
-#from forse.mmmtools import *
 from nntools import *
 from keras.models import Sequential, Model, load_model
 from keras.layers import UpSampling2D, Conv2D, Activation, BatchNormalization
@@ -75,18 +74,6 @@ class DCGAN:
         valid = self.discriminator(img)
         self.combined = Model(z, valid)
         self.combined.compile(loss='binary_crossentropy', optimizer=optimizer)
-
-    # def load_training_set(self, patches_file):
-    #     Y,X = np.load(patches_file)
-    #     Y = Y/X
-    #     Y = np.transpose(Y[:len(Y)])
-    #     X = np.transpose(X[:len(X)])
-    #     for i in range(Y.shape[-1]):
-    #         Y[:,:,i] = 2*(Y[:,:,i]-Y[:,:,i].min())/(Y[:,:,i].max()-Y[:,:,i].min())-1
-    #         X[:,:,i] = 2*(X[:,:,i]-X[:,:,i].min())/(X[:,:,i].max()-X[:,:,i].min())-1
-    #     x_train, x_test = split_training_set(X)
-    #     y_train, y_test = split_training_set(Y)
-    #     return x_train, x_test, y_train, y_test
 
     def train(self, epochs, patches_file, batch_size=32, save_interval=100, swap=None, seed=4324):
         self.build_gan()

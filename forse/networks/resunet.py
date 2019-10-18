@@ -1,4 +1,4 @@
-from forse.mmmtools import MinMaxRescale
+from nntools import *
 import numpy as np
 import tensorflow as tf
 from keras import layers
@@ -32,18 +32,6 @@ class ResUNet:
          self.model.load_weights(self.model_directory+"/models/resunet_model.h5")
          if self.verbose:
              print("Loaded model from disk")
-
-    # def load_training_set(self, patches_file):
-    #     Y,X = np.load(patches_file)
-    #     Y = Y-X
-    #     Y = np.transpose(Y[:len(Y)])
-    #     X = np.transpose(X[:len(X)])
-    #     for i in range(Y.shape[-1]):
-    #         Y[:,:,i] =MinMaxRescale(Y[:,:,i], a=-1, b=1 )
-    #         X[:,:,i] = MinMaxRescale(X[:,:,i], a=-1, b=1 )
-    #     x_train,x_val, x_test = split_trainvaltest_sets(X)
-    #     y_train,y_val, y_test = split_trainvaltest_sets(Y)
-    #     return x_train, x_val, x_test, y_train,y_val, y_test
 
     def conv_layer_block(self, X, f, filters, stage, block, s=2):
         """

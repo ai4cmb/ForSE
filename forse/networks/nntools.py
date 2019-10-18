@@ -24,7 +24,6 @@ def load_training_set(patches_file, part_train=0.8, part_test=0.2, part_val=None
                                                 seed=seed, reshape=reshape)
         return x_train, x_test, y_train, y_test
 
-
 def split_training_set(total_set, part_train=0.8, part_test=0.2, part_val=None, seed=4324, reshape=True):
     ntotal = total_set.shape[0]
     npix = total_set.shape[1]
