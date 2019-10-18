@@ -77,7 +77,7 @@ class DCGAN:
 
     def load_training_set(self, patches_file):
         Y,X = np.load(patches_file)
-        Y = Y-X
+        Y = Y/X
         Y = np.transpose(Y[:len(Y)])
         X = np.transpose(X[:len(X)])
         for i in range(Y.shape[-1]):
@@ -87,7 +87,7 @@ class DCGAN:
         y_train, y_test = split_training_set(Y)
         return x_train, x_test, y_train, y_test
 
-    def train(self, epochs, patches_file, batch_size=32, save_interval=100):
+    def train(self, epochs, patches_file, batch_size=32, save_interval=100, swap=None):
         self.build_gan()
         X_train, X_test, Y_train, Y_test = self.load_training_set(patches_file)
         print("Training Data Shape: ", X_train.shape)
@@ -106,10 +106,14 @@ class DCGAN:
             # Train the discriminator (real classified as ones and generated as zeros)
             target_real = np.ones((half_batch, 1))
             target_fake = np.zeros((half_batch, 1))
-            swap = np.random.randint(0, 100)
-            if swap < half_batch:
-                target_real[swap] = 0
-                target_fake[swap] = 1
+            if swap:
+                swap_real = np.random.randint(0, 100, swap)
+                swap_fake = np.random.randint(0, 100, swap)
+                for i in range(swap):
+                    if swap_real[i] < half_batch:
+                        target_real[swap_real[i]] = 0.
+                    if swap_fake[i] < half_batch:
+                        target_fake[swap_fake[i]] = 1.
             d_loss_real = self.discriminator.train_on_batch(imgs, target_real)
             d_loss_fake = self.discriminator.train_on_batch(gen_imgs, target_fake)
             d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)

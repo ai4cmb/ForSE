@@ -25,6 +25,7 @@ wheels/
 *.egg
 MANIFEST
 *.DS_store
+*.ipynb_checkpoints
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -34,7 +35,9 @@ MANIFEST
 
 # test
 ./forse/notebooks/temp
-#jupyter notebooks
+
+#notebooks
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
-~
+*.ipynb
+
