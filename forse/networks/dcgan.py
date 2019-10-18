@@ -1,4 +1,4 @@
-from nntools import *
+from forse.tools.nn_tools import *
 from keras.models import Sequential, Model, load_model
 from keras.layers import UpSampling2D, Conv2D, Activation, BatchNormalization
 from keras.layers import Reshape, Dense, Input

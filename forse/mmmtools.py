@@ -65,15 +65,15 @@ def make_train_set(Ntrain, m_hres, m_lres, Npix, patch_dim, seed=None):
     patches = np.array([high_res_patches, low_res_patches])
     return patches
 
-def split_training_set(xraw):
-    nstamps = xraw.shape[-1]
-    npix = xraw.shape[0]
-    nchans = 1
-    ntrains = int(nstamps *  4./5.)
-    ntests = int(nstamps * 1./5.)
-    train = xraw[:,:,:ntrains].T.reshape(ntrains,npix,npix, 1)
-    test = xraw[:,:,-ntests:].T.reshape(ntests,npix,npix,  1)
-    return train, test
+#def split_training_set(xraw):
+    #nstamps = xraw.shape[-1]
+    #npix = xraw.shape[0]
+    #nchans = 1
+    #ntrains = int(nstamps *  4./5.)
+    #ntests = int(nstamps * 1./5.)
+    #train = xraw[:,:,:ntrains].T.reshape(ntrains,npix,npix, 1)
+    #test = xraw[:,:,-ntests:].T.reshape(ntests,npix,npix,  1)
+    #return train, test
 
 def divide_image(image):
     test_set_zoom = np.zeros((25, 64, 64))
@@ -107,6 +107,6 @@ def bin_history(history, bins=100):
     return x_binned, data_binned
 
 
-def MinMaxRescale(x,a=0,b=1):
-    xresc = (b-a)*(x- x.min() )/(x.max() - x.min() ) +a
-    return xresc
+#def MinMaxRescale(x,a=0,b=1):
+    #xresc = (b-a)*(x- x.min() )/(x.max() - x.min() ) +a
+    #return xresc
