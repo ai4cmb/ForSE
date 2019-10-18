@@ -8,13 +8,21 @@ def load_training_set(patches_file, part_train=0.8, part_test=0.2, part_val=None
         Y[i] = rescale_min_max(Y[i])
         X[i] = rescale_min_max(X[i])
     if part_val:
-        x_train, x_val, x_test = split_training_set(X, part_train=part_train, part_test=part_test, part_val=part_val, seed=seed, reshape=reshape)
-        y_train, y_val, y_test = ssplit_training_set(Y, part_train=part_train, part_test=part_test, part_val=part_val, seed=seed, reshape=reshape)
+        x_train, x_val, x_test = split_training_set(X, part_train=part_train,
+                                                        part_test=part_test, part_val=part_val,
+                                                        seed=seed, reshape=reshape)
+        y_train, y_val, y_test = ssplit_training_set(Y, part_train=part_train,
+                                                        part_test=part_test, part_val=part_val,
+                                                        seed=seed, reshape=reshape)
         return x_train, x_val, x_test, y_train, y_val, y_test
     else:
-        x_train, x_test = split_training_set(X, part_train=part_train, part_test=part_test, part_val=part_val, seed=seed, reshape=reshape)
-        y_train, y_test = ssplit_training_set(Y, part_train=part_train, part_test=part_test, part_val=part_val, seed=seed, reshape=reshape)
-        return, x_train, x_test, y_train, y_test
+        x_train, x_test = split_training_set(X, part_train=part_train,
+                                                part_test=part_test, part_val=part_val,
+                                                seed=seed, reshape=reshape)
+        y_train, y_test = ssplit_training_set(Y, part_train=part_train,
+                                                part_test=part_test, part_val=part_val,
+                                                seed=seed, reshape=reshape)
+        return x_train, x_test, y_train, y_test
 
 
 def split_training_set(total_set, part_train=0.8, part_test=0.2, part_val=None, seed=4324, reshape=True):
