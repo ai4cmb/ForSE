@@ -1,4 +1,6 @@
-from nntools import *
+from forse.tools.nn_tools import *
+from forse.tools.img_tools import *
+from forse.tools.mix_tools import *
 import numpy as np
 import tensorflow as tf
 from keras import layers
