@@ -51,7 +51,7 @@ def make_train_set(Ntrain, m_hres, m_lres, Npix, patch_dim, seed=None):
         lat = np.random.uniform(-90,90)
         lon = np.random.uniform(0,360)
         header = set_header(lon, lat, sizepatch, Npix)
-        if len(m_hres)>3: 
+        if len(m_hres)>3:
             high_res_patches.append(h2f(m_hres, header))
             low_res_patches.append(h2f(m_lres, header))
         else:
@@ -61,9 +61,9 @@ def make_train_set(Ntrain, m_hres, m_lres, Npix, patch_dim, seed=None):
                 high_res_patch_TQU[i] = h2f(m_hres[i], header)
                 low_res_patch_TQU[i] = h2f(m_lres[i], header)
             high_res_patches.append(high_res_patch_TQU)
-            low_res_patches.append(low_res_patch_TQU)         
+            low_res_patches.append(low_res_patch_TQU)
     patches = np.array([high_res_patches, low_res_patches])
-    return patches 
+    return patches
 
 def split_training_set(xraw):
     nstamps = xraw.shape[-1]
@@ -105,3 +105,8 @@ def bin_history(history, bins=100):
     data_binned = np.array(data_binned)
     x_binned = np.array(x_binned)
     return x_binned, data_binned
+
+
+def MinMaxRescale(x,a=0,b=1):
+    xresc = (b-a)*(x- x.min() )/(x.max() - x.min() ) +a
+    return xresc
