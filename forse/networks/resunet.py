@@ -28,7 +28,7 @@ def conv_layer_block(X, f, filters, stage, block, s = 2):
     conv_id = block + str(stage)
     X = Dropout(rate=0.3, seed=stage, name='dropout_'+conv_id ) (X)
     if s==1:
-        X = Conv2D(filters, (f,f), padding='same', kernel_initializer=glorot_uniform(seed=0), 
+        X = Conv2D(filters, (f,f), padding='same', kernel_initializer=glorot_uniform(seed=0),
                 name='conv_'+conv_id)(X)
     elif s==2:
             X = Conv2D(filters, (f,f), strides=(s,s), padding='same', name='conv_stride_'+conv_id)(X)
@@ -45,7 +45,7 @@ def split_trainvaltest_sets(xraw):
     ntests =    int (nstamps * 1./10.)
     return (
         xraw[:,:,:ntrains].T.reshape(ntrains,npix,npix,  1),
-        xraw[:,:, ntrains:ntrains + nvals].T.reshape(nvals,npix,npix,  1), 
+        xraw[:,:, ntrains:ntrains + nvals].T.reshape(nvals,npix,npix,  1),
         xraw[:,:,-ntests:].T.reshape(ntests,npix,npix,  1))
 
 class ResUNet:
@@ -69,7 +69,7 @@ class ResUNet:
          self.model.compile(loss="mean_squared_error", optimizer = "Adam", metrics=['accuracy'])
          # load weights into new model
          self.model.load_weights(self.model_directory+"/models/resunet_model.h5")
-         if self.verbose: 
+         if self.verbose:
              print("Loaded model from disk")
 
     def load_training_set(self, patches_file):
@@ -145,7 +145,7 @@ class ResUNet:
                                      shuffle=True, verbose=self.verbose,
                                      validation_data=(x_val, y_val))
         scores = self.model.evaluate(x_train, y_train, verbose=self.verbose)
-        if self.verbose: 
+        if self.verbose:
             print(f"{self.model.metrics_names[1]} :  {scores[1]*100}")
         save_path = self.model_directory + "/models"
         if not os.path.exists(save_path):
