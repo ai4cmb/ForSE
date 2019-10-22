@@ -12,10 +12,16 @@ def rescale_min_max(img, a=-1, b=1, return_min_max=False):
         return img_resc
 
 def rescale_min_max_back(img, min_max):
+    # No need of this function , we can just use rescale_min_max 
+    # with rescale_min_max( img,  a= img.min(), and b = img.max() ) 
+    
     img_back = (img+1)/2.*(min_max[1]-min_max[0])+min_max[0]
     return(img_back)
 
+## Imported from PICASSO https://github.com/giuspugl/picasso
+
 def h2f(hmap, target_header, coord_in='G'):
+    ## Imported from PICASSO https://github.com/giuspugl/picasso
     #project healpix -> flatsky
     pr, footprint = reproject.reproject_from_healpix(
         (hmap, coord_in), target_header, shape_out=(500,500),
@@ -23,6 +29,7 @@ def h2f(hmap, target_header, coord_in='G'):
     return pr
 
 def f2h(flat, target_header, nside, coord_in='G'):
+    ## Imported from PICASSO https://github.com/giuspugl/picasso
     #project flatsky->healpix
     pr, footprint = reproject.reproject_to_healpix(
         (flat, target_header),coord_system_out='G', nside=nside ,
@@ -30,6 +37,7 @@ def f2h(flat, target_header, nside, coord_in='G'):
     return pr
 
 def set_header(ra,dec, size_patch , Npix=128):
+    ## Imported from PICASSO https://github.com/giuspugl/picasso
     hdr = fits.Header()
     hdr.set('SIMPLE' , 'T')
     hdr.set('BITPIX' , -32)

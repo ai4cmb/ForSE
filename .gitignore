@@ -38,4 +38,5 @@ MANIFEST
 #notebooks
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
+*/.ipynb_checkpoints/*.py
 *.ipynb

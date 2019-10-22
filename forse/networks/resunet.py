@@ -1,3 +1,7 @@
+## Imported from 
+# https://github.com/AdalbertoCq/Deep-Learning-Specialization-Coursera.git 
+
+
 from forse.tools.nn_tools import *
 from forse.tools.img_tools import *
 from forse.tools.mix_tools import *
@@ -12,16 +16,15 @@ from keras.optimizers import RMSprop
 import os
 
 class ResUNet:
-    def __init__(self, output_directory='./', img_size=64,
-                    epochs=500, batch_size=128, verbose=True,
+    def __init__(self, output_directory='./', img_size=(64,64) ,
+                      verbose=True,
                     pretrained=False):
         self.img_size = img_size
-        print(self.img_size)
         self.nchannels = 1
         self.model_directory = output_directory
-        self.epochs = epochs
+        
         self.verbose = verbose
-        self.batch_size = batch_size
+        
         self.pretrained = pretrained
 
     def load_model(self):
@@ -63,7 +66,7 @@ class ResUNet:
 
     def build_resunet(self):
         f=5
-        X_input = Input((self.img_size,self.img_size, self.nchannels ))
+        X_input = Input((self.img_size[0],self.img_size[1] , self.nchannels ))
         #encoder
         X = self.conv_layer_block(X_input, f, filters=64, stage=1, block='enc_', s=1) #64 x128
         Xin = X
@@ -112,25 +115,26 @@ class ResUNet:
                         optimizer='Adam',
                         metrics=['accuracy'])
 
-    def train(self, patches_file, part_train=0.8, part_test=0.1, part_val=0.1, seed=4324):
+    def train(self, patches_file, epochs=500,batch_size=128,part_train=0.8, part_val=0.2,   seed=4324):
+        self.batch_size = batch_size
+        self.epochs = epochs
         if self.pretrained:
             self.load_model()
         else:
             self.build_resunet()
-        x_train, x_val, x_test, y_train, y_val, y_test = load_training_set(patches_file,
-                                                            part_train=part_train, part_test=part_test,
-                                                            part_val=part_val, seed=seed)
+        x_train, x_val,  y_train, y_val = load_training_set(patches_file,
+                                                            part_train=part_train, part_test=part_val, seed=seed)
         training = self.model.fit(x_train, y_train, epochs=self.epochs, batch_size=self.batch_size,
                                      shuffle=True, verbose=self.verbose,
                                      validation_data=(x_val, y_val))
         scores = self.model.evaluate(x_train, y_train, verbose=self.verbose)
         if self.verbose:
             print(f"{self.model.metrics_names[1]} :  {scores[1]*100}")
-        save_path = self.model_directory + "/models"
+        save_path = self.model_directory + "/models/"
         if not os.path.exists(save_path):
             os.makedirs(save_path)
         for key in training.history.keys():
-            np.save(save_path + f'/{key}_resunet{self.epochs}.npy', np.array (training.history[key]))
+            np.save(save_path + f'{key}_resunet{self.epochs}.npy', np.array (training.history[key]))
         model_json=  self.model.to_json()
         with open(save_path+'resunet_model.json', "w")  as json_file:
             json_file.write(model_json)

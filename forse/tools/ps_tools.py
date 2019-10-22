@@ -1,5 +1,7 @@
 import numpy as np
 
+## Imported from CMB Analysis Summer-School https://github.com/jeffmcm1977/CMBAnalysis_SummerSchool
+
 
 def kendric_method_precompute_window_derivitives(win,pix_size):
     delta = pix_size * np.pi /180. /60.
