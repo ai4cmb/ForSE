@@ -1,5 +1,5 @@
-## Imported from 
-# https://github.com/AdalbertoCq/Deep-Learning-Specialization-Coursera.git 
+## Imported from
+# https://github.com/AdalbertoCq/Deep-Learning-Specialization-Coursera.git
 
 
 from forse.tools.nn_tools import *
@@ -13,6 +13,7 @@ from keras.layers import Input, Add, Dense, Activation, ZeroPadding2D,UpSampling
 from keras.models import Model, model_from_json
 from keras.initializers import glorot_uniform
 from keras.optimizers import RMSprop
+from keras.callbacks  import ModelCheckpoint
 import os
 
 class ResUNet:
@@ -22,9 +23,9 @@ class ResUNet:
         self.img_size = img_size
         self.nchannels = 1
         self.model_directory = output_directory
-        
+
         self.verbose = verbose
-        
+
         self.pretrained = pretrained
 
     def load_model(self):
@@ -122,15 +123,20 @@ class ResUNet:
             self.load_model()
         else:
             self.build_resunet()
+        save_path = self.model_directory + "/models/"
+        checkpointer = ModelCheckpoint(filepath=save_path+"resunet_model.h5", verbose=1,
+                                save_weights_only=True, save_best_only=True)
+
         x_train, x_val,  y_train, y_val = load_training_set(patches_file,
                                                             part_train=part_train, part_test=part_val, seed=seed)
         training = self.model.fit(x_train, y_train, epochs=self.epochs, batch_size=self.batch_size,
                                      shuffle=True, verbose=self.verbose,
-                                     validation_data=(x_val, y_val))
+                                     validation_data=(x_val, y_val), callbacks=[checkpointer],
+                                     )
+
         scores = self.model.evaluate(x_train, y_train, verbose=self.verbose)
         if self.verbose:
             print(f"{self.model.metrics_names[1]} :  {scores[1]*100}")
-        save_path = self.model_directory + "/models/"
         if not os.path.exists(save_path):
             os.makedirs(save_path)
         for key in training.history.keys():
