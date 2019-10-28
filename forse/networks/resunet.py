@@ -1,7 +1,6 @@
 ## Imported from
 # https://github.com/AdalbertoCq/Deep-Learning-Specialization-Coursera.git
 
-
 from forse.tools.nn_tools import *
 from forse.tools.img_tools import *
 from forse.tools.mix_tools import *
