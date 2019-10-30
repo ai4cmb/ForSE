@@ -15,6 +15,7 @@ from keras.optimizers import RMSprop
 from keras.callbacks  import ModelCheckpoint
 import os
 
+
 class ResUNet:
     def __init__(self, output_directory='./', img_size=(64,64) ,
                       verbose=True,
