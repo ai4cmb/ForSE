@@ -34,9 +34,5 @@ MANIFEST
 *.spec
 
 # test
-./forse/notebooks/temp
-#notebooks
-.ipynb_checkpoints
-*/.ipynb_checkpoints/*
-*/.ipynb_checkpoints/*.py
-*.ipynb
+./forse/notebooks/temp/
+
