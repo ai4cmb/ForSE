@@ -1,6 +1,8 @@
 from forse.networks.dcgan import *
 import matplotlib.pyplot as plt
-from forse.mmmtools import *
+from forse.tools.nn_tools import *
+from forse.tools.img_tools import *
+from forse.tools.mix_tools import *
 
 dcgan = DCGAN(output_directory='/global/homes/k/krach/scratch/NNforFG/DCGAN/tests/diff', img_size=(64, 64))
 training_path = '/global/homes/k/krach/scratch/NNforFG/training_set/'
