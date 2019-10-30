@@ -84,7 +84,7 @@ class DCGAN:
         half_batch = batch_size // 2
         accs = []
         for epoch in range(epochs):
-            ind_batch = np.random.randint(0, 800, batch_size)
+            ind_batch = np.random.randint(0, X_train.shape[0], batch_size)
             # Train Generator
             g_loss = self.combined.train_on_batch(X_train[ind_batch], np.ones((batch_size, 1)))
             # Train Discriminator
