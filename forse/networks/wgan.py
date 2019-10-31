@@ -75,7 +75,7 @@ class WGAN:
             optimizer=optimizer,
             metrics=['accuracy'])
         self.generator = self.build_generator()
-        self.generator.compile(loss=self.wasserstein_loss, optimizer=optimizer)
+        #self.generator.compile(loss=self.wasserstein_loss, optimizer=optimizer)
         z = Input(shape=img_shape)
         img = self.generator(z)
         self.critic.trainable = False
@@ -94,16 +94,11 @@ class WGAN:
         accs = []
         for epoch in range(epochs):
             for _ in range(self.n_critic):
-                print(_)
                 idx = np.random.randint(0, X_train.shape[0], batch_size)
                 imgs = Y_train[idx]
-                print('read_img')
                 gen_imgs = self.generator.predict(X_train[idx])
-                print('gen_img')
                 d_loss_real = self.critic.train_on_batch(imgs, valid)
-                print('train_1')
                 d_loss_fake = self.critic.train_on_batch(gen_imgs, fake)
-                print('train_2')
                 d_loss = 0.5 * np.add(d_loss_fake, d_loss_real)
                 for l in self.critic.layers:
                     weights = l.get_weights()
@@ -111,7 +106,7 @@ class WGAN:
                     l.set_weights(weights)
             acc = [d_loss_real[1], d_loss_fake[1]]
             accs.append(acc)
-            g_loss = self.combined.train_on_batch(noise, valid)
+            g_loss = self.combined.train_on_batch(X_train[idx], valid)
             if epoch % (save_interval) == 0:
                 print(f"{epoch} [D loss: {d_loss[0]} | D Accuracy: {100 * d_loss[1]}] [G loss: {g_loss}]")
                 save_path = self.output_directory + "/models"
