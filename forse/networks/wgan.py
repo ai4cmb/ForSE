@@ -5,7 +5,8 @@ from keras.models import Sequential, Model, load_model
 from keras.layers import UpSampling2D, Conv2D, Activation, BatchNormalization
 from keras.layers import Reshape, Dense, Input
 from keras.layers import LeakyReLU, Dropout, Flatten, ZeroPadding2D
-from keras.optimizers import Adam
+from keras.optimizers import Adam, RMSprop
+import keras.backend as K
 import numpy as np
 import os
 
@@ -18,7 +19,7 @@ class WGAN:
         self.n_critic = 5
         self.clip_value = 0.01
 
-     def wasserstein_loss(self, y_true, y_pred):
+    def wasserstein_loss(self, y_true, y_pred):
         return K.mean(y_true * y_pred)
 
     def build_generator(self):
@@ -66,7 +67,7 @@ class WGAN:
         validity = model(img)
         return Model(img, validity)
 
-    def build_wgan(self):
+    def build_gan(self):
         img_shape = (self.img_size[0], self.img_size[1], self.channels)
         optimizer = RMSprop(lr=0.00005)
         self.critic = self.build_critic()
@@ -74,6 +75,7 @@ class WGAN:
             optimizer=optimizer,
             metrics=['accuracy'])
         self.generator = self.build_generator()
+        self.generator.compile(loss=self.wasserstein_loss, optimizer=optimizer)
         z = Input(shape=img_shape)
         img = self.generator(z)
         self.critic.trainable = False
@@ -92,12 +94,16 @@ class WGAN:
         accs = []
         for epoch in range(epochs):
             for _ in range(self.n_critic):
+                print(_)
                 idx = np.random.randint(0, X_train.shape[0], batch_size)
-                imgs = X_train[idx]
                 imgs = Y_train[idx]
+                print('read_img')
                 gen_imgs = self.generator.predict(X_train[idx])
+                print('gen_img')
                 d_loss_real = self.critic.train_on_batch(imgs, valid)
+                print('train_1')
                 d_loss_fake = self.critic.train_on_batch(gen_imgs, fake)
+                print('train_2')
                 d_loss = 0.5 * np.add(d_loss_fake, d_loss_real)
                 for l in self.critic.layers:
                     weights = l.get_weights()
