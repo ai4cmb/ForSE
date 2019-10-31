@@ -85,15 +85,11 @@ class DCGAN:
         accs = []
         for epoch in range(epochs):
             ind_batch = np.random.randint(0, X_train.shape[0], batch_size)
-            # Train Generator
             g_loss = self.combined.train_on_batch(X_train[ind_batch], np.ones((batch_size, 1)))
-            # Train Discriminator
             idx = np.random.randint(0, X_train.shape[0], half_batch)
             imgs = Y_train[idx]
-            # Sample noise and generate a half batch of new images
             idx = np.random.randint(0, X_train.shape[0], half_batch)
             gen_imgs = self.generator.predict(X_train[idx])
-            # Train the discriminator (real classified as ones and generated as zeros)
             target_real = np.ones((half_batch, 1))
             target_fake = np.zeros((half_batch, 1))
             if swap:
