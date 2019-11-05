@@ -27,21 +27,21 @@ class WGAN:
         model = Sequential()
         model.add(Conv2D(64, kernel_size=self.kernel_size, padding="same")) # 64x64x64
         model.add(LeakyReLU(alpha=0.2))
-        model.add(BatchNormalization(momentum=0.5))
+        model.add(BatchNormalization(momentum=0.8))
         model.add(Conv2D(128, kernel_size=self.kernel_size, padding="same", strides=2)) #32x32x128
         model.add(LeakyReLU(alpha=0.2))
-        model.add(BatchNormalization(momentum=0.5))
+        model.add(BatchNormalization(momentum=0.8))
         model.add(Conv2D(256, kernel_size=self.kernel_size, padding="same", strides=2)) #16x16x256
         model.add(LeakyReLU(alpha=0.2))
-        model.add(BatchNormalization(momentum=0.5))
+        model.add(BatchNormalization(momentum=0.8))
         model.add(UpSampling2D())  #32x32x128
         model.add(Conv2D(128, kernel_size=self.kernel_size, padding="same"))
         model.add(LeakyReLU(alpha=0.2))
-        model.add(BatchNormalization(momentum=0.5))
+        model.add(BatchNormalization(momentum=0.8))
         model.add(UpSampling2D())  #64x64x64
         model.add(Conv2D(64, kernel_size=self.kernel_size, padding="same"))
         model.add(LeakyReLU(alpha=0.2))
-        model.add(BatchNormalization(momentum=0.5))
+        model.add(BatchNormalization(momentum=0.8))
         model.add(Conv2D(self.channels, kernel_size=self.kernel_size, padding="same"))
         model.add(Activation("tanh"))
         img_in = Input(shape=img_shape)
@@ -54,10 +54,10 @@ class WGAN:
         model.add(Conv2D(64, kernel_size=self.kernel_size, strides=1, input_shape=img_shape, padding="same"))
         model.add(LeakyReLU(alpha=0.2))
         model.add(Dropout(0.25))
-        model.add(BatchNormalization(momentum=0.5))
+        model.add(BatchNormalization(momentum=0.8))
         model.add(Conv2D(128, kernel_size=self.kernel_size, strides=2, padding="same"))
         model.add(Dropout(0.25))
-        model.add(BatchNormalization(momentum=0.5))
+        model.add(BatchNormalization(momentum=0.8))
         model.add(Conv2D(256, kernel_size=self.kernel_size, strides=2, padding="same"))
         model.add(LeakyReLU(alpha=0.2))
         model.add(Dropout(0.25))
@@ -75,7 +75,7 @@ class WGAN:
             optimizer=optimizer,
             metrics=['accuracy'])
         self.generator = self.build_generator()
-        #self.generator.compile(loss=self.wasserstein_loss, optimizer=optimizer)
+        self.generator.compile(loss=self.wasserstein_loss, optimizer=optimizer)
         z = Input(shape=img_shape)
         img = self.generator(z)
         self.critic.trainable = False
