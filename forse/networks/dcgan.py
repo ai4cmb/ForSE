@@ -88,6 +88,7 @@ class DCGAN:
         print("Training Data Shape: ", X_train.shape)
         half_batch = batch_size // 2
         accs = []
+        self.discriminator.summary()
         for epoch in range(epochs):
             ind_batch = np.random.randint(0, X_train.shape[0], batch_size)
             g_loss = self.combined.train_on_batch(X_train[ind_batch], np.ones((batch_size, 1)))
@@ -113,7 +114,14 @@ class DCGAN:
 
             # If at save interval => save generated image samples, save model files
             if epoch % (save_interval) == 0:
-                print(f"{epoch} [D loss: {d_loss[0]} | D Accuracy: {100 * d_loss[1]}] [G loss: {g_loss}]")
+                print(epoch)
+                d_loss_real = self.discriminator.train_on_batch(imgs, target_real)
+                d_loss_fake = self.discriminator.train_on_batch(gen_imgs, target_fake)
+                gen_imgs_test = self.generator.predict(X_test)
+                val_fake = self.discriminator.evaluate(gen_imgs_test, np.zeros(len(gen_imgs_test)))
+                val_real = self.discriminator.evaluate(Y_test, np.ones(len(gen_imgs_test)))
+                print(val_fake, val_real)
+                #print(f"{epoch} [D loss: {d_loss[0]} | D Accuracy: {100 * d_loss[1]}]")
                 save_path = self.output_directory + "/models"
                 if not os.path.exists(save_path):
                     os.makedirs(save_path)

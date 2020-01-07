@@ -20,7 +20,7 @@ def rescale_min_max_back(img, min_max):
 
 ## Imported from PICASSO https://github.com/giuspugl/picasso
 
-def h2f(hmap, target_header, coord_in='G'):
+def h2f(hmap, target_header, coord_in='C'):
     ## Imported from PICASSO https://github.com/giuspugl/picasso
     #project healpix -> flatsky
     pr, footprint = reproject.reproject_from_healpix(
@@ -28,11 +28,11 @@ def h2f(hmap, target_header, coord_in='G'):
         order='nearest-neighbor', nested=False)
     return pr
 
-def f2h(flat, target_header, nside, coord_in='G'):
+def f2h(flat, target_header, nside, coord_in='C'):
     ## Imported from PICASSO https://github.com/giuspugl/picasso
     #project flatsky->healpix
     pr, footprint = reproject.reproject_to_healpix(
-        (flat, target_header),coord_system_out='G', nside=nside ,
+        (flat, target_header),coord_system_out='C', nside=nside ,
         order='nearest-neighbor', nested=False)
     return pr
 
@@ -59,7 +59,8 @@ def set_header(ra,dec, size_patch , Npix=128):
     hdr.set('COORDSYS','icrs')
     return hdr
 
-def make_patches_from_healpix(Npatches, m_hres, m_lres, Npix, patch_dim, seed=None):
+def make_patches_from_healpix(
+        Npatches, m_hres, m_lres, Npix, patch_dim, lat_lim=None, seed=None):
     high_res_patches = []
     low_res_patches = []
     reso_amin = patch_dim*60./Npix
@@ -67,7 +68,10 @@ def make_patches_from_healpix(Npatches, m_hres, m_lres, Npix, patch_dim, seed=No
     if seed:
         np.random.seed(seed)
     for N in range(Npatches):
-        lat = np.random.uniform(-90,90)
+        if lat_lim:
+            lat = np.random.uniform(-lat_lim,lat_lim)
+        else:
+            lat = np.random.uniform(-90,90)
         lon = np.random.uniform(0,360)
         header = set_header(lon, lat, sizepatch, Npix)
         if len(m_hres)>3:
