@@ -10,7 +10,6 @@ We aim at training the NN with Planck data. For now we are considering Planck du
 To produce the training set we are considering the regions where the signal to noise of the map is higher than 8 producing a mask as follows:
 
 * Take the full resolution Planck T map at 353 GHz
-* c
 * Compute the S/N ratio considering the full resolution variance map in T
 * Generate a mask that includes all the region with S/N>8
 * Smooth the mask with a gaussian beam with FWHM=1° and retain everything is above 0.9
@@ -34,13 +33,38 @@ To produce the training set we are considering the regions where the signal to n
 
 
 
-
-
-
-
 ## Training DCGAN: 
 
 ##### 2020 March 26 (Nicoletta)
 
-First we use the training set generated as described above to train the DCGAN. This neural network is the first GAN we have build and up to now is the one working better.
+First we use the training set generated as described above to train the DCGAN. 
 
+I'm currently trying to update the architecture of the original DCGAN I have been using in the past, as serveral issues where present. In particular, there was a strange warning on the number of trainable parameters, probably due to the way the `trainbale=False` flag was used for the Discriminator when the Generator is trained. 
+
+This update of the DCGAN architecture is currently done one a notebook which is here: `/global/homes/k/krach/scratch/NNforFG/ForSE/DCGAN`in the `build_dcgan.ipynb` file. <!--(ci sono alcune note a riguardo sul mio quaderno in data 26 Febbraio 2020)-->
+
+It seems to work properly if the GAN is built in the following way:
+
+```python
+    self.discriminator = self.build_discriminator()
+    self.discriminator.trainable = True
+    self.discriminator.compile(loss='binary_crossentropy',
+                                   optimizer=optimizer,
+                                   metrics=['accuracy'])
+    self.generator = self.build_generator()
+    self.generator.compile(loss='binary_crossentropy', optimizer=optimizer)
+    z = Input(shape=img_shape)
+    img = self.generator(z)
+    self.discriminator.trainable = False
+    self.discriminator.compile(loss='binary_crossentropy',
+                                   optimizer=optimizer,
+                                   metrics=['accuracy'])
+    valid = self.discriminator(img)
+    self.combined = Model(z, valid)
+    self.combined.compile(loss='binary_crossentropy', optimizer=optimizer)
+    self.discriminator = self.build_discriminator()
+    self.discriminator.trainable = True
+    self.discriminator.compile(loss='binary_crossentropy',
+                                   optimizer=optimizer,
+                                   metrics=['accuracy'])
+```
