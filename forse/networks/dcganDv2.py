@@ -3,13 +3,14 @@ from forse.tools.img_tools import *
 from forse.tools.mix_tools import *
 from keras.models import Sequential, Model, load_model
 from keras.layers import UpSampling2D, Conv2D, Activation, BatchNormalization
-from keras.layers import Reshape, Dense, Input
+from keras.layers import Reshape, Dense, Input, Concatenate
 from keras.layers import LeakyReLU, Dropout, Flatten, ZeroPadding2D
 from keras.optimizers import Adam
 from keras import losses
 import numpy as np
 import os
 from keras import backend as K
+import tensorflow as tf
 
 class DCGAN:
     def __init__(self, output_directory, img_size):
@@ -48,7 +49,7 @@ class DCGAN:
         return Model(img_in, img_out)
 
     def build_discriminator(self):
-        img_shape = (self.img_size[0], self.img_size[1], self.channels)
+        img_shape = (self.img_size[0], self.img_size[1], 2)
         model = Sequential()
         model.add(Conv2D(64, kernel_size=self.kernel_size, strides=1, input_shape=img_shape, padding="same"))
         model.add(LeakyReLU(alpha=0.2))
@@ -68,7 +69,7 @@ class DCGAN:
 
     def build_gan(self):
         img_shape = (self.img_size[0], self.img_size[1], self.channels)
-        optimizer = Adam(0.0002, 0.9)
+        optimizer = Adam(0.0002, 0.5)
         self.discriminator = self.build_discriminator()
         self.discriminator.compile(loss='binary_crossentropy',
                                        optimizer=optimizer,
@@ -78,7 +79,9 @@ class DCGAN:
         z = Input(shape=img_shape)
         img = self.generator(z)
         self.discriminator.trainable = False
-        valid = self.discriminator(img)
+        #Dinput = Concatenate([img, z], axis=3)
+        Dinput = Concatenate()([img, z])
+        valid = self.discriminator(Dinput)
         self.combined = Model(z, valid)
         self.combined.compile(loss='binary_crossentropy', optimizer=optimizer)
 
@@ -96,6 +99,7 @@ class DCGAN:
             target_fake = np.zeros((half_batch, 1))
             idx = np.random.randint(0, X_train.shape[0], half_batch)
             imgs = Y_train[idx]
+            large_scale = X_train[idx]
             gen_imgs = self.generator.predict(X_train[idx])
             if swap:
                 swap_real = np.random.randint(0, 100, swap)
@@ -105,8 +109,10 @@ class DCGAN:
                         target_real[swap_real[i]] = 0
                     if swap_fake[i] < half_batch:
                         target_fake[swap_fake[i]] = 1
-            d_loss_real = self.discriminator.train_on_batch(imgs, target_real)
-            d_loss_fake = self.discriminator.train_on_batch(gen_imgs, target_fake)
+            d_loss_real = self.discriminator.train_on_batch(
+                np.concatenate((imgs, large_scale), axis=3),  target_real)
+            d_loss_fake = self.discriminator.train_on_batch(
+                np.concatenate((gen_imgs, large_scale), axis=3), target_fake)
             d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
             acc = [d_loss_real[1], d_loss_fake[1]]
             accs.append(acc)
@@ -115,12 +121,16 @@ class DCGAN:
             # If at save interval => save generated image samples, save model files
             if epoch % (save_interval) == 0:
                 print(epoch)
-                d_loss_real = self.discriminator.train_on_batch(imgs, target_real)
-                d_loss_fake = self.discriminator.train_on_batch(gen_imgs, target_fake)
-                gen_imgs_test = self.generator.predict(X_test)
-                val_fake = self.discriminator.evaluate(gen_imgs_test, np.zeros(len(gen_imgs_test)))
-                val_real = self.discriminator.evaluate(Y_test, np.ones(len(gen_imgs_test)))
-                print(val_fake, val_real)
+                #d_loss_real = self.discriminator.train_on_batch(
+                    #np.concatenate((imgs, large_scale), axis=3), target_real)
+                #d_loss_fake = self.discriminator.train_on_batch(
+                    #np.concatenate((gen_imgs, large_scale), axis=3), target_fake)
+                #gen_imgs_test = self.generator.predict(X_test)
+                #val_fake = self.discriminator.evaluate(
+                    #gen_imgs_test, np.zeros(len(gen_imgs_test)))
+                #val_real = self.discriminator.evaluate(
+                    #Y_test, np.ones(len(gen_imgs_test)))
+                #print(val_fake, val_real)
                 #print(f"{epoch} [D loss: {d_loss[0]} | D Accuracy: {100 * d_loss[1]}]")
                 save_path = self.output_directory + "/models"
                 if not os.path.exists(save_path):
