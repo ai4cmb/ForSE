@@ -43,7 +43,7 @@ I'm currently trying to update the architecture of the original DCGAN I have bee
 
 This update of the DCGAN architecture is currently done one a notebook which is here: `/global/homes/k/krach/scratch/NNforFG/ForSE/DCGAN`in the `build_dcgan.ipynb` file. <!--(ci sono alcune note a riguardo sul mio quaderno in data 26 Febbraio 2020)-->
 
-It seems to work properly if the GAN is built in the following way:
+It seems to work properly if the DCGAN is built in the following way:
 
 ```python
     self.discriminator = self.build_discriminator()
@@ -68,3 +68,13 @@ It seems to work properly if the GAN is built in the following way:
                                    optimizer=optimizer,
                                    metrics=['accuracy'])
 ```
+The GENERATOR, DISCRIMINATOR and COMBINED have the following number of parameters:
+
+<img src="generator.png" style="zoom:30%;" />
+
+<img src="discriminator.png" style="zoom:30%;" />
+
+<img src="combined.png" style="zoom:30%;" />
+
+**<u>Important note:</u>** the above notebook on Jupyter at NERSC seems to work only with kernel `tensorflow-v1.15-0-gpu`!!!
+
