@@ -4,7 +4,7 @@
 
 <u>Work in progress codes are on the Github ForSe repository in the `workinprog` branch</u>
 
-*Last update 2020 March 26th*
+*Last update 2020 March 30th*
 
 ------
 
@@ -108,9 +108,19 @@ Also, since there is a problem with the tensorflow-gpu on nodes at Nersc, traini
 
 The validation of results is in`test_dcgan.ipynb`
 
+***2020 March 30th (Nicoletta)***
+
+*Note: I've check whether it makes sense to use the difference between low res and high res maps instead of the ratio, but from a visual inspection of the images it doesn't seem to make much difference. Therefore I keep going with the ratio. One thing that should be adjusted is the way I normalize back the NN maps.*  
+
+*I could also try to change the batch size, as well as the dropout and batch normalization. Also I can try again by giving to the discriminator both large and small scales!*
+
+*Another thing is try to train the generator longer than discriminator*
+
 ------
 
 **RUN #1**
+
+***2020 March 27th (Nicoletta)***
 
 Specification for the first run:
 
@@ -129,15 +139,30 @@ However the superposition of Minkowski functionals (computed on the whole test s
 
 <img src="Minko_run1.png" style="zoom:45%;" />
 
-Below an example of application of the NN to a patch 20°x20°, after combination of smaller patch, normalization and restoring of the large scales. Note that images label are wrong: NN output (left panel), HFI small scales (middel panel), HFI large scale (right panel).
+**2020 March 30th (Nicoletta)***
 
-<img src="large_patch_run1.png" style="zoom:35%;" />
+I've applied the NN to all the large patches generated from Planck 353 GHZ temperature map: 
+
+- Original patches are `/global/homes/k/krach/scratch/NNforFG/ForSE/training_sets/`in file `training_set_358patches_20x20deg_T_HR12amin_LR1deg_Npix320_mask8.npy`
+-  Results at Nersc are in ``/global/homes/k/krach/scratch/NNforFG/ForSE/DCGAN/test/old/run1/output/output_planck_patches.npz` 
+- I've copied them also on Mowgli here: `/Users/niki/Workspace/NeuralNetworks/FGss/NNforFG/ForSE/DCGAN/test/old/run1/output`
+- Notebook to compute power spectra with NaMaster is the folder `/Users/niki/Workspace/NeuralNetworks/FGss/NNforFG/ForSE`file `ForSE_spectra.ipynb`
+
+This is an example of image and power spectrum (patch 56):
+
+<img src="LP_hfi.png" style="zoom:120%;" />
+
+<img src="LP_hfi_spectrum.png" style="zoom:120%;" />
+
+Although the power spectrum doesn't look bad, I don't think the images look good, therefore optimization of the network is needed.
 
 ------
 
 **RUN #2**
 
-Specification for the first run:
+***2020 March 27th (Nicoletta)***
+
+Specification for the second run:
 
 - `dcgan.train(epochs=100000, patches_file=patch_file, batch_size=32, save_interval=1000, swap=10)`
 
@@ -159,5 +184,16 @@ The situation doesn't seem to improve, with the NN which still cannot recover th
 
 **RUN #3**
 
-*Change Adam parameters to default!*
+***2020 March 30th (Nicoletta)***
+
+Specification for the third run:
+
+- `dcgan.train(epochs=100000, patches_file=patch_file, batch_size=32, save_interval=1000, swap=10)`
+- `optimizer = Adam(0.0002)` I've change the optimizer
+- No label smoothing
+- swap at 10%
+
+The run has been submitted with slurm and it is currently on queue
+
+
 
