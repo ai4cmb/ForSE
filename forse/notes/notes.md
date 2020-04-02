@@ -4,7 +4,7 @@
 
 <u>Work in progress codes are on the Github ForSe repository in the `workinprog` branch</u>
 
-*Last update 2020 March 30th*
+*Last update 2020 April 1st*
 
 ------
 
@@ -40,6 +40,14 @@ To produce the training set we are considering the regions where the signal to n
   <img src="training_exp.png" alt="img" style="zoom:50%;" />
 
 * Another file with 358 patches of dimension 20°x20° and 320x320 pixels is in the same folder here: `training_set_358patches_20x20deg_T_HR12amin_LR1deg_Npix320_mask8.npy`
+
+***2020 April 2nd (Nicoletta)***
+
+I've found a bug in the way map with 320 pixels where generated (there was no correspondance with the mask due to a problem with the random seed I was passing). Now it has been corrected, there are few new files in the training folder:
+
+1. `training_set_HFI_359patches_20x20deg_T_HR12amin_LR1deg_Npix320_mask8.npy`which has 359 patches from Planck T map at 353 GHz at 1deg and 12arcmin and can be used for train
+2. `test_set_HFI_178patches_20x20deg_T_HR12amin_LR1deg_Npix320_mask8.npy`178 patches from HFI that can be used to test the NN
+3. `test_set_PySM_178patches_20x20deg_T_HR12amin_LR1deg_Npix320_mask8.npy`same patches as the file before (same location) but taken from the PySM map at 12arcmin and 1deg.
 
 ------
 
@@ -110,11 +118,19 @@ The validation of results is in`test_dcgan.ipynb`
 
 ***2020 March 30th (Nicoletta)***
 
-*Note: I've check whether it makes sense to use the difference between low res and high res maps instead of the ratio, but from a visual inspection of the images it doesn't seem to make much difference. Therefore I keep going with the ratio. One thing that should be adjusted is the way I normalize back the NN maps.*  
+Note: I've check whether it makes sense to use the difference between low res and high res maps instead of the ratio, but from a visual inspection of the images it doesn't seem to make much difference. Therefore I keep going with the ratio. 
 
-*I could also try to change the batch size, as well as the dropout and batch normalization. Also I can try again by giving to the discriminator both large and small scales!*
+***2020 March 31th (Nicoletta)***
 
-*Another thing is try to train the generator longer than discriminator*
+I've trained to train the network directly with images of 320x320 pixels, but it seems to crash due to a lack of memory
+
+------
+
+**TO DO**
+
+1. *One thing that should be adjusted is the way I normalize back the NN maps.*
+2. *I could also try to change the batch size, as well as the dropout and batch normalization. Also I can try again by giving to the discriminator both large and small scales!*
+3. *Another thing is try to train the generator longer than discriminator*
 
 ------
 
@@ -154,7 +170,7 @@ This is an example of image and power spectrum (patch 56):
 
 <img src="LP_hfi_spectrum.png" style="zoom:120%;" />
 
-Although the power spectrum doesn't look bad, I don't think the images look good, therefore optimization of the network is needed.
+Although the power spectrum doesn't look bad, I don't think the images look good, therefore optimization of the network is needed. Morover is some cases (as the one shown above) there is an excess of power at low ell.
 
 ------
 
@@ -193,7 +209,77 @@ Specification for the third run:
 - No label smoothing
 - swap at 10%
 
-The run has been submitted with slurm and it is currently on queue
+The run has been submitted with slurm using the `train_dcgan_on_cori.py`script in the usual folder
+
+Results do not improve, with superposition of the Minkoswski functionals at the level of 71, 78, 83%. 
+
+------
+
+**RUN #4**
+
+***2020 March 31st (Nicoletta)***
+
+In this run I check the effect of removing batch normalization and dropout.
+
+- `dcgan.train(epochs=100000, patches_file=patch_file, batch_size=32, save_interval=1000)`
+- `optimizer = Adam(0.0002, 0.5)`
+- No label smoothing
+- No swap 
+
+Also in this case it doesn't seem to improve with superposition at the level of 77, 83, 79%.
+
+I therefore restore the batch normalization (but I don't put the dropout in the convolutional layers as I think it is not correct having them, there is dropout only in the last fully connected layer)
+
+------
+
+**RUN #5**
+
+***2020 April 2nd (Nicoletta)***
+
+I try to train the network directly with images of 320x320 pixels, as the problem might be in the apodization. It seems to crash with batch size of 32 due to lack of memory. Therefore I had to reduce the batch size to 16.
+
+To train the NN I've used the new correct training set in `/global/homes/k/krach/scratch/NNforFG/ForSE/training_sets/` `training_set_HFI_359patches_20x20deg_T_HR12amin_LR1deg_Npix320_mask8.npy` (see section above)
+
+Since now at NERSC there is the possibility to run longer jobs in the Pacific night (from 5am to 5pm in Italy), I've run the job in these hours using the command `sleep time_in_sec && sbatch file.slurm` to delay the submission.
+
+The notebook to test results is in the usual folder in the file `test_large_patches.ipynb`
+
+**Results below are preliminary from Epoch=24000**
+
+I've valide results on the two test files, for HFI and PySM (`test_set_HFI_178patches_20x20deg_T_HR12amin_LR1deg_Npix320_mask8.npy` and `test_set_PySM_178patches_20x20deg_T_HR12amin_LR1deg_Npix320_mask8.npy`).
+
+I've also change the way I normalize back images. Now I first set the mean and standard deviation to be the same as the rescaled target distribution, then I normalize back with min/max:
+
+```python
+Ss_ratio_edges = np.array(Ss_ratio_edges)
+NNout_normed = np.copy(NNout)
+for i in range(len(NNout)):
+    NNout_normed[i] = 
+    (NNout_normed[i]-np.mean(NNout_normed[i])+np.mean(Ss_ratio_scaled[i]))/np.std(NNout_normed[i])*np.std(Ss_ratio_scaled[i])
+    NNout_normed[i] = (
+        rescale_min_max_back(NNout_normed[i], 
+        [(Ss_ratio_edges[i,0]), (Ss_ratio_edges[i,1])]))
+```
 
 
+
+Below images of the small scales only generated by the GAN for Planck test set (image 10):
+
+<img src="LP_NN_HFI.png" style="zoom:120%;" />
+
+And these are the minkoswki functionals, computed on all the 178 patches of the train set, which reach a superposition of 56, 63, 84%
+
+<img src="Minko_LP_HFI.png" style="zoom:100%;" />
+
+I also compare the results on PySM, considering the same patches for PySM and HFI (images 27 and 89):
+
+<img src="LP_PYSMvsPlanck.png" style="zoom:120%;" />
+
+And this is the comparison of Minkowski functionals:
+
+<img src="Minko_LP_PYSMvsPlanck.png" style="zoom:100%;" />
+
+I've computed also the spectra. The file are saved in `output_run5_planck_patches_iter24000.npz`
+
+<img src="LP_hfivspysm_spectrum29.png" style="zoom:80%;" /> <img src="LP_hfivspysm_spectrum89.png" style="zoom:80%;" />
 
