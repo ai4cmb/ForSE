@@ -4,7 +4,7 @@
 
 <u>Work in progress codes are on the Github ForSe repository in the `workinprog` branch</u>
 
-*Last update 2020 April 1st*
+*Last update 2020 April 10th*
 
 ------
 
@@ -311,13 +311,35 @@ Using the method describe on the dedicated Section we have reprojected back the 
 
 Nonetheless there are several problems which needs to be solved. Below the fractional difference between the PySM at 12' and the output from the NN. As is visible there are several patches where the difference is high (it might be due to point sources and normalization)
 
-<img src="pysm-nn_fullsky.png" style="zoom:50%;" />
+<img src="pysm-nn_fullsky.png" style="zoom:30%;" />
 
 Zomming into the maps in some region is visible the border effect of the patchwork, this might be correct with an optimized apodization of the patches:
 
 
 
-<img src="pysm_patch_ex.png" style="zoom:40%;" />
+<img src="pysm_patch_ex.png" style="zoom:35%;" />
+
+#### RUN #6
+
+***2020 April 10th (Nicoletta)***
+
+The GNILC Dust temperature map, from the Planck data release 2015 has two differences with respect to the COMMANDER: (i) It is clean from CIB; (ii) is at high resolution (5') in s large portion of the sky. In particular in figure 2 of https://arxiv.org/pdf/1605.09387.pdf is reported the effective angular resolution in the different region:
+
+<img src="GNILC2015_fwhm.png" style="zoom:35%;" />
+
+The 2018 GNILC release has two maps, one which includes TQU dust maps at angular resolution of 80' everywhere, the other which varying angular resolution. 
+
+The GNILC maps are at NERSC in: `/global/homes/k/krach/scratch/NNforFG/maps`
+
+In this run I try to train the DCGAN to go from GNILC_2018_T_80a to GNILC_2015_T_5a. Since I don't have the fits file of the FWHM map above, I get the training set on the same mask used before, obtained from Planck HFI data (not that the used mask is all included in the 5' region in the figure above). The training file is in: `training_set_GNILC_547patches_10x10deg_T_HR5amin_LR80amin_Npix320_mask8.npy`. Note that since I have to go to much higher resolution I'm using smaller patches of 10x10 degrees with still 320x320 pixels. 
+
+Below an example of a patch in the training set:
+
+<img src="gnilc_train_patch.png" style="zoom:60%;" />
+
+
+
+
 
 ## Patchwork of the Healpix map
 
