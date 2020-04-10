@@ -128,13 +128,15 @@ I've trained to train the network directly with images of 320x320 pixels, but it
 
 **TO DO**
 
-1. *One thing that should be adjusted is the way I normalize back the NN maps.*
-2. *I could also try to change the batch size, as well as the dropout and batch normalization. Also I can try again by giving to the discriminator both large and small scales!*
-3. *Another thing is try to train the generator longer than discriminator*
+1. *Try to train the generator longer than discriminator (Nico)*
+2. *Train from PysM to HFI (Nico)*
+3. *inpaint point sources in HFI PySM map (Peppe)*
+4. *optimize reprojection on Healpix (Peppe)* 
+5. *Polarization (Nico and Peppe)*
 
 ------
 
-**RUN #1**
+#### **RUN #1**
 
 ***2020 March 27th (Nicoletta)***
 
@@ -174,7 +176,7 @@ Although the power spectrum doesn't look bad, I don't think the images look good
 
 ------
 
-**RUN #2**
+#### **RUN #2**
 
 ***2020 March 27th (Nicoletta)***
 
@@ -198,7 +200,7 @@ The situation doesn't seem to improve, with the NN which still cannot recover th
 
 ------
 
-**RUN #3**
+#### **RUN #3**
 
 ***2020 March 30th (Nicoletta)***
 
@@ -215,7 +217,7 @@ Results do not improve, with superposition of the Minkoswski functionals at the 
 
 ------
 
-**RUN #4**
+#### **RUN #4**
 
 ***2020 March 31st (Nicoletta)***
 
@@ -232,7 +234,7 @@ I therefore restore the batch normalization (but I don't put the dropout in the 
 
 ------
 
-**RUN #5**
+#### **RUN #5**
 
 ***2020 April 2nd (Nicoletta)***
 
@@ -282,4 +284,44 @@ And this is the comparison of Minkowski functionals:
 I've computed also the spectra. The file are saved in `output_run5_planck_patches_iter24000.npz`
 
 <img src="LP_hfivspysm_spectrum29.png" style="zoom:80%;" /> <img src="LP_hfivspysm_spectrum89.png" style="zoom:80%;" />
+
+##### Full sky projection
+
+***2020 April 10th (Nicoletta)***
+
+Given the promising results obtained with the #RUN5 on the maps with 320x320 pixels we attempt the full sky projection in order to see how far we are from our goal. 
+
+First we have decomposed the Healpix PySM full sky map smoothed at 1° at Nside=2048 into 20x20° (320x320 pixels) patches that cover the full sky. Patches have a superposition of 5° and the way they have been obtained is described in the dedicated section of this memos.
+
+We have then run the DCGAN trained in #RUN5 on all these patches. This is done as usually on cori in `/global/homes/k/krach/scratch/NNforFG/ForSE/DCGAN/PySM_fullsky_patches.ipynb`. The PySM patches are in: `/global/homes/k/krach/scratch/NNforFG/ForSE/pysm_test/patches_PySM_dust_T_nside2048_fwhm1.npy`(in the same folder there is also the 12amin version). 
+
+The obtained patches are in the same folder in file: `output_run5_pysm_patches_fullsky_iter24000.npz`
+
+First I have inspect the output patches and computed power spectra (patch 270)
+
+<img src="pysm_patch270_run5.png" style="zoom:80%;" />
+
+<img src="ps_pysm_patch270_run5.png" style="zoom:50%;" />
+
+There are some problematic patches, especially the ones where point sources are present. My suspect is that the presence of point surces in the patch messes up with the proccess of normalizing back to physical units. Peppe will try to work on an inpanted version of the PySM map, in order to remove the residual point sources. 
+
+Using the method describe on the dedicated Section we have reprojected back the patches on healpix in order to recover the full sky map. Below the full sky power spectrum which looks promising
+
+<img src="pysm_fullsky_spectra.png" style="zoom:50%;" />
+
+Nonetheless there are several problems which needs to be solved. Below the fractional difference between the PySM at 12' and the output from the NN. As is visible there are several patches where the difference is high (it might be due to point sources and normalization)
+
+<img src="pysm-nn_fullsky.png" style="zoom:50%;" />
+
+Zomming into the maps in some region is visible the border effect of the patchwork, this might be correct with an optimized apodization of the patches:
+
+
+
+<img src="pysm_patch_ex.png" style="zoom:40%;" />
+
+## Patchwork of the Healpix map
+
+*Peppe could you update this part with description on how you get patches from the Healpix map and how you project them back?*
+
+## 
 
