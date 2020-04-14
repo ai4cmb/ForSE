@@ -422,23 +422,23 @@ So that the flat  patch size is exactly $20\times 20 \, deg^2$.
 
 Below the input map used in this analysis. 
 
-![img](/Users/peppe/work/ForSE/forse/notes/reprojection/inputmap.png)
+![img](reprojection/inputmap.png)
 
  
 
 We now create a grid  of overlapping tiles, in total there are 288 square tiles.  Below you can see the map of overlaps from different projections, and also a close-up of the overlaps at the poles. 
 
-![img](/Users/peppe/work/ForSE/forse/notes/reprojection/overlap_moll.png)
+![img](reprojection/overlap_moll.png)
 
-![img](/Users/peppe/work/ForSE/forse/notes/reprojection/overlap_orth.png)
+![img](reprojection/overlap_orth.png)
 
 
 
-<img src="/Users/peppe/work/ForSE/forse/notes/reprojection/overlap_gnome.png" alt="img" style="zoom:100%;" />
+<img src="reprojection/overlap_gnome.png" alt="img" style="zoom:100%;" />
 
 Thus, the output healpix map results to be  estimated the average value of the projected patches  in the overlap region of the tiles. Below a comparison between healpix map reprojected from tiles and the input one : 
 
-<img src="/Users/peppe/work/ForSE/forse/notes/reprojection/reprojection_compare.png" alt="img" style="zoom:100%;" />
+<img src="reprojection/reprojection_compare.png" alt="img" style="zoom:100%;" />
 
 Notice that the differences are very small ! This is a good result! not only because we are keeping the same nside, but also because we have tested `reproject` package. Also the errors look to be very noise distributed which is a good indication that the tiling is not inducing any effect.  
 
@@ -447,11 +447,11 @@ Notice that the differences are very small ! This is a good result! not only bec
 
 Let's have a look more cloely to these maps. we focus at different latitudes to see there is some error due to the projection. 
 
-<img src="/Users/peppe/work/ForSE/forse/notes/reprojection/0.png" alt="img" style="zoom:100%;" />
+<img src="reprojection/0.png" alt="img" style="zoom:100%;" />
 
-<img src="/Users/peppe/work/ForSE/forse/notes/reprojection/45.png" alt="img" style="zoom:100%;" />
+<img src="reprojection/45.png" alt="img" style="zoom:100%;" />
 
-<img src="/Users/peppe/work/ForSE/forse/notes/reprojection/90.png" alt="img" style="zoom:100%;" />
+<img src="reprojection/90.png" alt="img" style="zoom:100%;" />
 
 ## Power spectra
 
@@ -459,7 +459,7 @@ Finally, to assess how the reprojection routine affects the angular scales, we e
 
 
 
-<img src="/Users/peppe/work/ForSE/forse/notes/reprojection/spectra.png" alt="img" style="zoom:100%;" />
+<img src="reprojection/spectra.png" alt="img" style="zoom:100%;" />
 
 ​	
 
