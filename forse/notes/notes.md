@@ -8,6 +8,18 @@
 
 ------
 
+## **TODO**
+
+1. *!! optimize reprojection on Healpix (Peppe)* 
+2. *!! Polarization (Nico and Peppe)*
+3. *!! Produce the GNILC map with gaussian small scales*
+4. *Try to train the generator longer than discriminator (Nico)*
+5. *inpaint point sources in HFI PySM map (Peppe) --> on hold as we have moved to GNILC* 
+
+------
+
+#### 
+
 [TOC]
 
 ## Training set 
@@ -119,20 +131,6 @@ The validation of results is in`test_dcgan.ipynb`
 ***2020 March 30th (Nicoletta)***
 
 Note: I've check whether it makes sense to use the difference between low res and high res maps instead of the ratio, but from a visual inspection of the images it doesn't seem to make much difference. Therefore I keep going with the ratio. 
-
-***2020 March 31th (Nicoletta)***
-
-I've trained to train the network directly with images of 320x320 pixels, but it seems to crash due to a lack of memory
-
-------
-
-**TO DO**
-
-1. *Try to train the generator longer than discriminator (Nico)*
-2. *Train from PysM to HFI (Nico)*
-3. *inpaint point sources in HFI PySM map (Peppe)*
-4. *optimize reprojection on Healpix (Peppe)* 
-5. *Polarization (Nico and Peppe)*
 
 ------
 
@@ -323,7 +321,7 @@ Zomming into the maps in some region is visible the border effect of the patchwo
 
 ***2020 April 10th (Nicoletta)***
 
-The GNILC Dust temperature map, from the Planck data release 2015 has two differences with respect to the COMMANDER: (i) It is clean from CIB; (ii) is at high resolution (5') in s large portion of the sky. In particular in figure 2 of https://arxiv.org/pdf/1605.09387.pdf is reported the effective angular resolution in the different region:
+The GNILC Dust temperature map, from the Planck data release 2015 has two differences with respect to the COMMANDER: (i) It is clean from CIB; (ii) is at high resolution (5') in a large portion of the sky. In particular in figure 2 of https://arxiv.org/pdf/1605.09387.pdf is reported the effective angular resolution in the different region:
 
 <img src="GNILC2015_fwhm.png" style="zoom:35%;" />
 
@@ -331,13 +329,53 @@ The 2018 GNILC release has two maps, one which includes TQU dust maps at angular
 
 The GNILC maps are at NERSC in: `/global/homes/k/krach/scratch/NNforFG/maps`
 
-In this run I try to train the DCGAN to go from GNILC_2018_T_80a to GNILC_2015_T_5a. Since I don't have the fits file of the FWHM map above, I get the training set on the same mask used before, obtained from Planck HFI data (not that the used mask is all included in the 5' region in the figure above). The training file is in: `training_set_GNILC_547patches_10x10deg_T_HR5amin_LR80amin_Npix320_mask8.npy`. Note that since I have to go to much higher resolution I'm using smaller patches of 10x10 degrees with still 320x320 pixels. 
+In this run I try to train the DCGAN to go from GNILC_2018_T_80a to GNILC_2015_T_5a.  I get the training set on the same mask used before, obtained from Planck HFI data (not that the used mask is all included in the 5' region in the figure above). The training file is in: `training_set_GNILC_547patches_10x10deg_T_HR5amin_LR80amin_Npix320_mask8.npy`. Note that since I have to go to much higher resolution I'm using smaller patches of 10x10 degrees with still 320x320 pixels. 
 
 Below an example of a patch in the training set:
 
 <img src="gnilc_train_patch.png" style="zoom:60%;" />
 
 
+
+Unfortunately results on this case, look pretty bad. It could be either that the jump from 80' to 5' is too much for the network, or that a 10x10° at 80' resultion is too small. I also tried with a second training set that instead of using the 2018 map at 80' smoothed at the same resultion the map of 2015. Results are still bad (this is **RUN #6b**)
+
+##### RUN #6d
+
+***2020 April 14th (Nicoletta)***
+
+Since it seems that the NN cannot go directly from 80' to 5', I try to go back to the old configuration and to go only to 12'.
+
+In **RUN #6c** I try to go from 1° do 12' using as before patches 20x20° and 320x320 pixels. The training set is `training_set_GNILC_smt_350patches_20x20deg_T_HR12amin_LR1deg_Npix320_mask8.npy`in the training set folder.
+
+Results seem to be good. 
+
+Anyway since the polarization maps are available only at 80' and our final goal is to be able to use this approach in polarization I've tried also to go from 80' to 12' with the same patch dimension (this is **RUN #6d**). Training set is `training_set_GNILC_smt_350patches_20x20deg_T_HR12amin_LR80amin_Npix320_mask8.npy`.
+
+I've train the NN for about 20 hours resulting in 110000 epochs, saving every 1000 epochs. for the resulting 110 models I've computed the minkowski functionals on the training set, and compute the superposition as well as the distance of the mean values for the 3 functionals (the code for doing this is `/global/homes/k/krach/scratch/NNforFG/ForSE/DCGAN/save_minko.py`while results are in the `output` directory in the file `minko_summary_run6d.npy`).
+
+<img src="run6d_distance.png" style="zoom:40%;" /><img src="run6d_superposition.png" style="zoom:40%;" />
+
+The epoch with the higher superposition and the smaller distance between the mean curves is epoch 37000, for which I report below the results.
+
+This is patch 8 of the training set:
+
+<img src="run6d_smallscales.png" style="zoom:60%;" />
+
+<img src="run6d_patches.png" style="zoom:60%;" />
+
+And the Minkowski functionals (these are compute on the trainig set), which reach a superposition at the level of 86, 83, 91%
+
+<img src="run6d_minko.png" style="zoom:100%;" />
+
+and this is the power spectrum (patch 270) (file with all the patches is `output_run6d_gnilc_patches_iter37000.npz`):
+
+<img src="run6d_ps.png" style="zoom:120%;" />
+
+Results seem really good, we can now try to go to full sky and to move to polarization!
+
+### Polarization
+
+The idea (following Peppe's suggestion) is to use the NN trained in T to produce small scales in polarized intensity. We will then go back to Q and U using the large angular scale polarization angle. 
 
 
 
