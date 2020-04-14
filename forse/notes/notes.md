@@ -381,7 +381,88 @@ The idea (following Peppe's suggestion) is to use the NN trained in T to produce
 
 ## Patchwork of the Healpix map
 
-*Peppe could you update this part with description on how you get patches from the Healpix map and how you project them back?*
+_Peppe 2020/04/10_ 
 
-## 
+We simulate a map with `healpy.synfast` from a _red_ power spectrum, i.e. $\propto \ell ^{-4}$  at a given nside and extracted _square sub-patches_ (or tiles)  with `healpix_reproject` package. To test the whole procedure, we perform a projection of this healpix map to flat,  and then from flat back to healpix to assess what is  the level of residuals  due to this projection.  
+
+Free parameters in this analysis are :
+
+##### From Healpix to Flat 
+
+   - `nside_in`  : nside of input healpix map  
+   - `pixel_size_flat` : size of pixels in the square  tile  (in arcmin)
+   - `Npix` : number of pixel in each tile 
+   - `overlap` : overlap (in degrees ) between two consecutive square tiles
+
+##### From Flat to Healpix
+
+   - `nside_out`  : nside of output healpix map  
+   - `pixel_size_flat` : size of pixels in the square  tile  (in arcmin)
+   - `Npix` : number of pixel in each tile 
+   - `overlap` : overlap (in degrees ) between two consecutive square tiles
+
+Conceptually we 'd expect that some hole is left when  `pixel_size_flat` is approximately close to the `pixel_size_healpix`, in which case it's strongly advised to use a coarser healpix pixelization (i.e. `nside_out=nside_in/2`). However, if enough overlap is allowed between square tiles this issue can be overcome and there is no need to reproject to a degraded pixelization.  Also I found that : 
+
+* If `healpix_pixel_size` > `pixel_size_flat`,  error are very small (can be numerically small)  
+* If `healpix_pixel_size` <~ pixel_size, error are 10 times smaller than the signal 
+
+
+
+In the following I adopted: 
+
+` 
+Npix= 320
+pixel_size = 3.75 *u.arcmin 
+overlap = 5*u.deg 
+` 
+
+So that the flat  patch size is exactly $20\times 20 \, deg^2$. 
+
+
+
+Below the input map used in this analysis. 
+
+![img](/Users/peppe/work/ForSE/forse/notes/reprojection/inputmap.png)
+
+ 
+
+We now create a grid  of overlapping tiles, in total there are 288 square tiles.  Below you can see the map of overlaps from different projections, and also a close-up of the overlaps at the poles. 
+
+![img](/Users/peppe/work/ForSE/forse/notes/reprojection/overlap_moll.png)
+
+![img](/Users/peppe/work/ForSE/forse/notes/reprojection/overlap_orth.png)
+
+
+
+<img src="/Users/peppe/work/ForSE/forse/notes/reprojection/overlap_gnome.png" alt="img" style="zoom:100%;" />
+
+Thus, the output healpix map results to be  estimated the average value of the projected patches  in the overlap region of the tiles. Below a comparison between healpix map reprojected from tiles and the input one : 
+
+<img src="/Users/peppe/work/ForSE/forse/notes/reprojection/reprojection_compare.png" alt="img" style="zoom:100%;" />
+
+Notice that the differences are very small ! This is a good result! not only because we are keeping the same nside, but also because we have tested `reproject` package. Also the errors look to be very noise distributed which is a good indication that the tiling is not inducing any effect.  
+
+
+#### Close-up of the reprojected map 
+
+Let's have a look more cloely to these maps. we focus at different latitudes to see there is some error due to the projection. 
+
+<img src="/Users/peppe/work/ForSE/forse/notes/reprojection/0.png" alt="img" style="zoom:100%;" />
+
+<img src="/Users/peppe/work/ForSE/forse/notes/reprojection/45.png" alt="img" style="zoom:100%;" />
+
+<img src="/Users/peppe/work/ForSE/forse/notes/reprojection/90.png" alt="img" style="zoom:100%;" />
+
+## Power spectra
+
+Finally, to assess how the reprojection routine affects the angular scales, we estimate the power spectra of the reprojected map with the one estimated from the input map. We have also considered the ratio between the two and we notice that at $\ell=1000$ there is a mild increase of scatter and loss of power from the reprojected map. 
+
+
+
+<img src="/Users/peppe/work/ForSE/forse/notes/reprojection/spectra.png" alt="img" style="zoom:100%;" />
+
+​	
+
+
+
 
