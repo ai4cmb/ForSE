@@ -1,10 +1,8 @@
 import numpy as np
 from forse.tools.img_tools import *
 
-def load_training_set(patches_file, part_train=0.8, part_test=0.2, part_val=None, seed=0, reshape=True, ratio=True):
+def load_training_set(patches_file, part_train=0.8, part_test=0.2, part_val=None, seed=0, reshape=True):
     Y,X = np.load(patches_file)
-    if ratio:
-        Y = Y/X
     for i in range(Y.shape[0]):
         Y[i] = rescale_min_max(Y[i])
         X[i] = rescale_min_max(X[i])
@@ -57,4 +55,3 @@ def split_training_set(total_set, part_train=0.8, part_test=0.2, part_val=None, 
         return train, val, test
     else:
         return train, test
-
