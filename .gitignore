@@ -33,7 +33,4 @@ MANIFEST
 *.manifest
 *.spec
 
-# test
-./forse/notebooks/temp/
-
 
