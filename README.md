@@ -30,7 +30,7 @@ The code is still under development. To install, use the following command:
 ## Repo organization
 
 * **forse/networks**: our GAN architecture used to generate small scale thermal dust maps. The network is developed in Keras+Tensorflow
-* **forse/tools:** some useful tools to get patches from Healpix maps, to generate training sets and to compute Mikowski functionals 
+* **forse/tools:** some useful tools to get patches from Healpix maps, to generate training sets and to compute Minkowski functionals 
 * **forse/scripts:** scripts to train the network (with the approach explained in the ForSE paper)
 * **forse/notebooks:** python notebooks to reproduce the results presented in the ForSE paper. One notebook for total intensity and one for polarization results.
 
