@@ -11,6 +11,9 @@ import numpy as np
 import os
 from keras import backend as K
 
+# Modified from: 
+# https://github.com/eriklindernoren/Keras-GAN.git
+
 class DCGAN:
      def __init__(self, output_directory, img_size):
          self.img_size = img_size
