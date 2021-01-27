@@ -6,7 +6,7 @@ We provide the neural network architecture, weights, data and python notebooks n
 
 We take advantage of a generative adversarial network (GAN) to produce realistic and non-Gaussian small scale features on CMB foreground maps.
 
-In our first application we use this approach to generate full sky polarized thermal dust maps at an angular resolution of 12 arc-minutes. 
+In our first application we used this approach to generate full sky polarized thermal dust maps at an angular resolution of 12 arc-minutes. 
 
 The maps are publicly available: https://portal.nersc.gov/project/sobs/users/ForSE/fullsky_maps/
 
@@ -36,11 +36,11 @@ The code is still under development. To install, use the following command:
 
 ## Data and NN weights
 
-We made publicly available the weights of the trained GANs (for both polarization and total intensitity):
+The weights of the trained GANs (for both polarization and total intensitity) are publicly available:
 
 https://portal.nersc.gov/project/sobs/users/ForSE/NN_datautils/weights/
 
-and the data used to train and test the network:
+as well as the data used to train and test the network:
 
 https://portal.nersc.gov/project/sobs/users/ForSE/NN_datautils/datasets/
 
