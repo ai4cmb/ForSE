@@ -11,7 +11,7 @@ import argparse
 import time
 import warnings
 warnings.filterwarnings("ignore")
-from projection_utils import (
+from projection_tools import (
                     get_lonlat, get_lonlat_adaptive,
                      reproject2fullsky,  make_mosaic_from_healpix  )
 

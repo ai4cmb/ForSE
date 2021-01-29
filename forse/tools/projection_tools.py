@@ -330,3 +330,39 @@ def reproject2fullsky ( tiles, lon, lat ,
     if  rank ==0 : print(f"   {len(tiles)} projected  in {e-s} sec" )
 
     return newmap, weightsmap
+
+
+def make_patches_from_healpix(
+        Npatches, m_hres, m_lres, Npix, patch_dim, lat_lim=None, seed=None, mask=None):
+    high_res_patches = []
+    low_res_patches = []
+    reso_amin = patch_dim*60./Npix
+    sizepatch = reso_amin/60.
+    if seed:
+        np.random.seed(seed)
+    if np.any(mask)==None:
+        mask_hp = m_hres*0.+1
+    else:
+        mask_hp = mask
+    for N in range(Npatches):
+        if lat_lim:
+            lat = np.random.uniform(-lat_lim,lat_lim)
+        else:
+            lat = np.random.uniform(-90,90)
+        lon = np.random.uniform(0,360)
+        header = set_header(lon, lat, sizepatch, Npix)
+        mask_patch = h2f(mask_hp, header)
+        if len(np.where(mask_patch>0)[0])/(Npix*Npix)>0.9:
+            if len(m_hres)>3:
+                high_res_patches.append(h2f(m_hres, header))
+                low_res_patches.append(h2f(m_lres, header))
+            else:
+                high_res_patch_TQU = np.zeros((len(m_hres), Npix, Npix))
+                low_res_patch_TQU = np.zeros((len(m_lres), Npix, Npix))
+                for i in range(len(m_hres)):
+                    high_res_patch_TQU[i] = h2f(m_hres[i], header)
+                    low_res_patch_TQU[i] = h2f(m_lres[i], header)
+                high_res_patches.append(high_res_patch_TQU)
+                low_res_patches.append(low_res_patch_TQU)
+    patches = np.array([high_res_patches, low_res_patches])
+    return patches
