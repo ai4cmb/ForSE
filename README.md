@@ -46,7 +46,9 @@ https://portal.nersc.gov/project/sobs/users/ForSE/NN_datautils/datasets/
 
 ## Citing
 
-If you use this code or any product, please cite the following paper: 
+If you use this code or any product, please cite:  [![DOI](https://zenodo.org/badge/333457057.svg)](https://zenodo.org/badge/latestdoi/333457057)
+
+and the following paper: 
 
 *ForSE: a GAN based algorithm for extending CMB foreground models to sub-degree angular scales*, Krachmalnicoff, N. & Puglisi, G. (2021), submitted to ApJ
 
