@@ -53,19 +53,22 @@ and the following paper:
 *ForSE: a GAN based algorithm for extending CMB foreground models to sub-degree angular scales*, Krachmalnicoff, N. & Puglisi, G. (2021), submitted to ApJ
 
 ```
-@ARTICLE{2020arXiv201102221K,
+@ARTICLE{2021ApJ...911...42K,
        author = {{Krachmalnicoff}, Nicoletta and {Puglisi}, Giuseppe},
-        title = "{ForSE: a GAN based algorithm for extending CMB foreground models to sub-degree angular scales}",
-      journal = {arXiv e-prints},
-     keywords = {Astrophysics - Cosmology and Nongalactic Astrophysics, Astrophysics - Instrumentation and Methods for Astrophysics},
-         year = 2020,
-        month = nov,
-          eid = {arXiv:2011.02221},
-        pages = {arXiv:2011.02221},
+        title = "{ForSE: A GAN-based Algorithm for Extending CMB Foreground Models to Subdegree Angular Scales}",
+      journal = {\apj},
+     keywords = {Cosmic microwave background radiation, Neural networks, Diffuse radiation, 322, 1933, 383, Astrophysics - Cosmology and Nongalactic Astrophysics, Astrophysics - Instrumentation and Methods for Astrophysics},
+         year = 2021,
+        month = apr,
+       volume = {911},
+       number = {1},
+          eid = {42},
+        pages = {42},
+          doi = {10.3847/1538-4357/abe71c},
 archivePrefix = {arXiv},
        eprint = {2011.02221},
  primaryClass = {astro-ph.CO},
-       adsurl = {https://ui.adsabs.harvard.edu/abs/2020arXiv201102221K},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2021ApJ...911...42K},
       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 ```
