@@ -18,6 +18,7 @@ The maps are publicly available: https://portal.nersc.gov/project/sobs/users/For
 - Keras: https://keras.io
 - reproject (only to perform projection from Healpix maps to flat patches and viceversa): https://pypi.org/project/reproject/
 - Namaster (only to compute power spectra): https://namaster.readthedocs.io/en/latest/
+- numba (only to accelearte the calculation of Minkowski functionals for a given patch): http://numba.pydata.org/
 
 ## Install
 
