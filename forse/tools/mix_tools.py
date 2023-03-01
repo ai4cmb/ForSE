@@ -1,4 +1,5 @@
 import numpy as np
+from numba import jit
 
 def bin_array(array, bins=100):
     len_data = len(array)
@@ -13,7 +14,7 @@ def bin_array(array, bins=100):
     x_binned = np.array(x_binned)
     return x_binned, data_binned
 
-
+@jit(nopython=True)
 def estimate_marchingsquare(data , threshold ):
     width = data.shape[0]
     height= data.shape[1]
@@ -26,34 +27,34 @@ def estimate_marchingsquare(data , threshold ):
             if (data[i+1,j+1] > threshold) : pattern += 4;
             if (data[i,j+1 ]  > threshold) : pattern += 8;
             if pattern ==0 :
-                break
+                continue
             elif pattern==1:
                 a1 = (data[i,j] - threshold) / (data[i,j] - data[i+1,j])
                 a4 = (data[i,j] - threshold) / (data[i,j] - data[i,(j+1)]);
                 f = f + 0.5 * a1 * a4;
                 u = u + np.sqrt(a1 * a1 + a4 * a4);
                 chi = chi + 0.25;
-                break;
+                continue;
             elif pattern==2:
                 a1 = (data[i,j] - threshold) / (data[i,j] - data[i+1,j]);
                 a2 = (data[i+1,j] - threshold) / (data[i+1,j] - data[i+1, (j+1)]);
                 f = f + 0.5 * (1 - a1) * (a2);
                 u = u + np.sqrt((1 - a1) * (1 - a1) + a2 * a2);
                 chi = chi + 0.25;
-                break;
+                continue;
             elif pattern==3:
                 a2 = (data[i+1,j] - threshold) / (data[i+1,j] - data[i+1,(j+1)]);
                 a4 = (data[i,j] - threshold) / (data[i,j] - data[i,(j+1)]);
                 f = f + a2 + 0.5 * (a4 - a2);
                 u = u + np.sqrt(1 + (a4 - a2) * (a4 - a2));
-                break;
+                continue;
             elif pattern==4:
                 a2 = (data[ i+1,j] - threshold) / (data[i+1,j ] - data[ i+1,j+1]);
                 a3 = (data[ i,j+1 ] -  threshold) / (data[i,j+1] - data[ i+1,j+1]);
                 f = f + 0.5 * (1 - a2) * (1 - a3);
                 u = u + np.sqrt((1 - a2) * (1 - a2) + (1 - a3) * (1 - a3));
                 chi = chi + 0.25;
-                break;
+                continue;
             elif pattern==5:
                 a1 = (data[i,j] - threshold) / (data[i,j] - data[i+1,j]);
                 a2 = (data[i+1,j] - threshold) / (data[i+1,j] - data[i+1,j+1]);
@@ -62,20 +63,20 @@ def estimate_marchingsquare(data , threshold ):
                 f = f + 1 - 0.5 * (1 - a1) * a2 - 0.5 * a3 * (1 - a4);
                 u = u + np.sqrt((1 - a1) * (1 - a1) + a2 * a2) + np.sqrt(a3 * a3 + (1 - a4) * (1 - a4));
                 chi = chi + 0.5;
-                break;
+                continue;
             elif pattern==6:
                 a1 = (data[i,j] - threshold) / (data[i,j] - data[i+1,j]);
                 a3 = (data[i,j+1] - threshold) / (data[i,j+1] - data[i+1,j+1]);
                 f = f + (1 - a3) + 0.5 * (a3 - a1);
                 u = u + np.sqrt(1 + (a3 - a1) * (a3 - a1));
-                break;
+                continue;
             elif pattern==7:
                 a3 = (data[i,j+1] - threshold) / (data[i,j+1] - data[i+1,j+1]);
                 a4 = (data[i,j] - threshold) / (data[i,j] - data[i,j+1]);
                 f = f + 1 - 0.5 * a3 * (1 - a4);
                 u = u + np.sqrt(a3 * a3 + (1 - a4) * (1 - a4));
                 chi = chi - 0.25;
-                break;
+                continue;
 
             elif pattern==8:
                 a3 = (data[i,j+1] - threshold) / (data[i,j+1] - data[i+1,j+1]);
@@ -83,13 +84,13 @@ def estimate_marchingsquare(data , threshold ):
                 f = f + 0.5 * a3 * (1 - a4);
                 u = u + np.sqrt(a3 * a3 + (1 - a4) * (1 - a4));
                 chi = chi + 0.25;
-                break;
+                continue;
             elif pattern==9:
                 a1 = (data[i,j] - threshold) / (data[i,j] - data[i+1,j]);
                 a3 = (data[i,j+1] - threshold) / (data[i,j+1] - data[i+1,j+1]);
                 f = f + a1 + 0.5 * (a3 - a1);
                 u = u + np.sqrt(1 + (a3 - a1) * (a3 - a1));
-                break;
+                continue;
             elif pattern==10:
                 a1 = (data[i,j] - threshold) / (data[i,j] - data[i+1,j]);
                 a2 = (data[i+1,j] - threshold) / (data[i+1,j] - data[i+1,j+1]);
@@ -98,37 +99,37 @@ def estimate_marchingsquare(data , threshold ):
                 f = f + 1 - 0.5 * a1 * a4 + 0.5 * (1 - a2) * (1 - a3);
                 u = u + np.sqrt(a1 * a1 + a4 * a4) + np.sqrt((1 - a2) * (1 - a2) + (1 - a3) * (1 - a3));
                 chi = chi + 0.5;
-                break;
+                continue;
             elif pattern==11:
                 a2 = (data[i+1,j] - threshold) / (data[i+1,j] - data[i+1,j+1]);
                 a3 = (data[i,j+1] - threshold) / (data[i,j+1] - data[i+1,j+1]);
                 f = f + 1 - 0.5 * (1 - a2) * (1 - a3);
                 u = u + np.sqrt((1 - a2) * (1 - a2) + (1 - a3) * (1 - a3));
                 chi = chi - 0.25;
-                break;
+                continue;
             elif pattern==12:
                 a2 = (data[i+1,j] - threshold) / (data[i+1,j] - data[i+1,j+1]);
                 a4 = (data[i,j] - threshold) / (data[i,j] - data[i,j+1]);
                 f = f + (1 - a2) + 0.5 * (a2 - a4);
                 u = u + np.sqrt(1 + (a2 - a4) * (a2 - a4));
-                break;
+                continue;
             elif pattern==13:
                 a1 = (data[i,j] - threshold) / (data[i,j] - data[i+1,j]);
                 a2 = (data[i+1,j] - threshold) / (data[i+1,j] - data[i+1,j+1]);
                 f = f + 1 - .5 * (1 - a1) * a2;
                 u = u + np.sqrt((1 - a1) * (1 - a1) + a2 * a2);
                 chi = chi - 0.25;
-                break;
+                continue;
             elif pattern==14:
                 a1 = (data[i,j] - threshold) / (data[i,j] - data[i+1,j]);
                 a4 = (data[i,j] - threshold) / (data[i,j] - data[i,j+1]);
                 f = f + 1 - 0.5 * a1 * a4;
                 u = u + np.sqrt(a1 * a1 + a4 * a4);
                 chi = chi - 0.25;
-                break;
+                continue;
             elif pattern == 15:
                 f +=1 ;
-                break;
+                continue;
 
 
     return f,u, chi
